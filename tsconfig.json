@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@components/*": ["./*"],
+      "@components/*": ["./components/*"],
+      "@pages/*": ["./pages/*"],
       "@styles/*": ["./styles/*"],
       "@lib/*": ["./lib/*"],
       "@hooks/*": ["./hooks/*"],
