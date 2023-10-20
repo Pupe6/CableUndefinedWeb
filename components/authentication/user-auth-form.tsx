@@ -8,25 +8,72 @@ import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { Label } from "@components/ui/label";
 
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const schema = z
+	.object({
+		username: z.string().regex(/^[a-zA-Z0-9]+$/),
+		email: z.string().email(),
+		password: z
+			.string()
+			.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/),
+		confirmPassword: z.string(),
+	})
+	.refine(data => data.password === data.confirmPassword, {
+		message: "Passwords do not match",
+		path: ["confirmPassword"],
+	});
+
+type FormValues = z.infer<typeof schema>;
+
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-	const [isLoading, setIsLoading] = React.useState<boolean>(false);
+	const [isLoading, setIsLoading] = React.useState(false);
 
-	async function onSubmit(event: React.SyntheticEvent) {
-		event.preventDefault();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<FormValues>({
+		resolver: zodResolver(schema),
+	});
+
+	const onSubmit: SubmitHandler<FormValues> = async (data: FormValues) => {
 		setIsLoading(true);
-
-		setTimeout(() => {
+		try {
+			// await signIn("credentials", {
+			// 	redirect: false,
+			// 	username: data.username,
+			// 	password: data.password,
+			// });
+		} catch (error) {
+			console.error(error);
+		} finally {
 			setIsLoading(false);
-		}, 3000);
-	}
+		}
+	};
 
 	return (
 		<div className={cn("grid gap-6", className)} {...props}>
-			<form onSubmit={onSubmit}>
+			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className="grid gap-2">
 					<div className="grid gap-1">
+						<Label className="sr-only" htmlFor="username">
+							Username
+						</Label>
+						<Input
+							id="username"
+							placeholder="Username"
+							type="text"
+							autoCapitalize="none"
+							autoComplete="username"
+							autoCorrect="off"
+							disabled={isLoading}
+							{...register("username")}
+						/>
 						<Label className="sr-only" htmlFor="email">
 							Email
 						</Label>
@@ -38,6 +85,33 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 							autoComplete="email"
 							autoCorrect="off"
 							disabled={isLoading}
+							{...register("email")}
+						/>
+						<Label className="sr-only" htmlFor="password">
+							Password
+						</Label>
+						<Input
+							id="password"
+							placeholder="Password"
+							type="password"
+							autoCapitalize="none"
+							autoComplete="current-password"
+							autoCorrect="off"
+							disabled={isLoading}
+							{...register("password")}
+						/>
+						<Label className="sr-only" htmlFor="confirm-password">
+							Confirm Password
+						</Label>
+						<Input
+							id="confirm-password"
+							placeholder="Confirm Password"
+							type="password"
+							autoCapitalize="none"
+							autoComplete="current-password"
+							autoCorrect="off"
+							disabled={isLoading}
+							{...register("confirmPassword")}
 						/>
 					</div>
 					<Button disabled={isLoading}>
