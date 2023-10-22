@@ -22,6 +22,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSearchParams } from "next/navigation";
 
 const schema = z
 	.object({
@@ -46,20 +47,36 @@ const schema = z
 
 type FormValues = z.infer<typeof schema>;
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserRegisterFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+export function UserRegisterForm({
+	className,
+	...props
+}: UserRegisterFormProps) {
 	const { toast } = useToast();
 
-	const [signUp, { isLoading, error }] = useRegisterMutation();
+	const [signUp, { isLoading }] = useRegisterMutation();
+
+	const searchParams = useSearchParams();
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(schema),
+		defaultValues: {
+			username: searchParams.get("username") ?? "",
+			email: searchParams.get("email") ?? "",
+			password: searchParams.get("password") ?? "",
+			confirmPassword: searchParams.get("confirmPassword") ?? "",
+		},
 	});
 
 	const onSubmit: SubmitHandler<FormValues> = async (data: FormValues) => {
 		try {
-			await signUp(data).unwrap();
+			await signUp({
+				email: data.email,
+				password: data.password,
+				username: data.username,
+			}).unwrap();
+
 			toast({
 				title: "Account created.",
 				description: "We've created your account for you.",
@@ -113,16 +130,18 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 										<FormLabel className="sr-only">
 											Email
 										</FormLabel>
-										<Input
-											id="email"
-											placeholder="name@example.com"
-											type="email"
-											autoCapitalize="none"
-											autoComplete="email"
-											autoCorrect="off"
-											disabled={isLoading}
-											{...field}
-										/>
+										<FormControl>
+											<Input
+												id="email"
+												placeholder="name@example.com"
+												type="email"
+												autoCapitalize="none"
+												autoComplete="email"
+												autoCorrect="off"
+												disabled={isLoading}
+												{...field}
+											/>
+										</FormControl>
 										<FormMessage>
 											{formState.errors.email?.message}
 										</FormMessage>
@@ -137,16 +156,18 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 										<FormLabel className="sr-only">
 											Password
 										</FormLabel>
-										<Input
-											id="password"
-											placeholder="Password"
-											type="password"
-											autoCapitalize="none"
-											autoComplete="current-password"
-											autoCorrect="off"
-											disabled={isLoading}
-											{...field}
-										/>
+										<FormControl>
+											<Input
+												id="password"
+												placeholder="Password"
+												type="password"
+												autoCapitalize="none"
+												autoComplete="current-password"
+												autoCorrect="off"
+												disabled={isLoading}
+												{...field}
+											/>
+										</FormControl>
 										<FormMessage>
 											{formState.errors.password?.message}
 										</FormMessage>
@@ -161,16 +182,18 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 										<FormLabel className="sr-only">
 											Confirm Password
 										</FormLabel>
-										<Input
-											id="confirm-password"
-											placeholder="Confirm Password"
-											type="password"
-											autoCapitalize="none"
-											autoComplete="current-password"
-											autoCorrect="off"
-											disabled={isLoading}
-											{...field}
-										/>
+										<FormControl>
+											<Input
+												id="confirm-password"
+												placeholder="Confirm Password"
+												type="password"
+												autoCapitalize="none"
+												autoComplete="current-password"
+												autoCorrect="off"
+												disabled={isLoading}
+												{...field}
+											/>
+										</FormControl>
 										<FormMessage />
 									</FormItem>
 								)}
