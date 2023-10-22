@@ -1,8 +1,18 @@
 import { apiSlice } from "../../api/api-slice";
 
+export interface LoginRequest {
+	email: string;
+	password: string;
+}
+export interface RegisterRequest {
+	email: string;
+	password: string;
+	username: string;
+}
+
 const authApiSlice = apiSlice.injectEndpoints({
 	endpoints: builder => ({
-		login: builder.mutation({
+		login: builder.mutation<void, LoginRequest>({
 			query: ({ email, password }) => ({
 				url: "auth/login",
 				method: "POST",
@@ -12,14 +22,14 @@ const authApiSlice = apiSlice.injectEndpoints({
 				},
 			}),
 		}),
-		register: builder.mutation({
-			query: ({ email, password, name }) => ({
+		register: builder.mutation<void, RegisterRequest>({
+			query: ({ email, password, username }) => ({
 				url: "auth/register",
 				method: "POST",
 				body: {
 					email,
 					password,
-					name,
+					username,
 				},
 			}),
 		}),
