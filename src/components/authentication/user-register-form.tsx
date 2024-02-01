@@ -61,6 +61,7 @@ export function UserRegisterForm({
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(schema),
+
 		defaultValues: {
 			username: searchParams.get("username") ?? "",
 			email: searchParams.get("email") ?? "",

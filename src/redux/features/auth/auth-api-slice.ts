@@ -10,7 +10,7 @@ export interface RegisterRequest {
 	username: string;
 }
 
-const authApiSlice = apiSlice.injectEndpoints({
+export const authApiSlice = apiSlice.injectEndpoints({
 	endpoints: builder => ({
 		login: builder.mutation<void, LoginRequest>({
 			query: ({ email, password }) => ({
@@ -20,6 +20,8 @@ const authApiSlice = apiSlice.injectEndpoints({
 					email,
 					password,
 				},
+				credentials: "include",
+				withCredentials: true,
 			}),
 		}),
 		register: builder.mutation<void, RegisterRequest>({
@@ -46,6 +48,7 @@ const authApiSlice = apiSlice.injectEndpoints({
 			}),
 		}),
 	}),
+	overrideExisting: false,
 });
 
 export const {
