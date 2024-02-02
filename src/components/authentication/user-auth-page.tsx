@@ -1,9 +1,9 @@
 import Link from "next/link";
-
-import { cn } from "@lib/utils";
+import React from "react";
+import { cn } from "../../lib/utils";
 import { buttonVariants } from "../../components/ui/button";
-import { UserLoginForm } from "@components/authentication/user-login-form";
-import { UserRegisterForm } from "@components/authentication/user-register-form";
+import { UserLoginForm } from "./user-login-form";
+import { UserRegisterForm } from "./user-register-form";
 
 interface Props {
 	register?: boolean;

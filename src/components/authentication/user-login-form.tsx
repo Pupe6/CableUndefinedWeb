@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { cn } from "@lib/utils";
+import { cn } from "../../lib/utils";
 import { Icons } from "../icons";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -16,7 +16,7 @@ import {
 	FormControl,
 } from "../ui/form";
 
-import { useLoginMutation } from "@redux/features/auth/auth-api-slice";
+import { useLoginMutation } from "../../redux/features/auth/auth-api-slice";
 
 import { useForm, SubmitHandler } from "react-hook-form";
 

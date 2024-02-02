@@ -1,4 +1,5 @@
 import "./globals.css";
+import * as React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "../components/theme-provider";
-import { ReduxProvider } from "@redux/provider";
+import { ReduxProvider } from "../redux/provider";
 
 import { Toaster } from "../components/ui/toaster";
 
