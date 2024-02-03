@@ -22,6 +22,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/lib/utils": ["./src/lib/utils"],
       "@redux/*": ["./src/redux/*"],
       "@types/*": ["./src/types/*"],
     }

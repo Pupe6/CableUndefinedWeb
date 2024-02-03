@@ -2,58 +2,59 @@
 
 import React, { useState, useRef } from "react";
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
-import "@wokwi/elements";
 import { wokwiElements } from "../../../utils/extract-wokwi-elements";
 
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuTrigger,
-} from "@radix-ui/react-context-menu";
+} from "@/components/ui/context-menu";
 import { toast } from "sonner";
 
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+	getAllElements,
+	addElement,
+	dragElement,
+	editElementName,
+	deleteElement,
+} from "@/redux/features/diagrams/diagrams-slice";
 interface ElementProps {
 	id: number;
-	x: number;
-	y: number;
-	name?: string;
-	onDrag: (position: { x: number; y: number }) => void;
-	onRotate: (rotation: number) => void;
 	children?: React.ReactNode;
 }
 
-const DiagramElement: React.FC<ElementProps> = ({
-	id,
-	x,
-	y,
-	name,
-	onDrag,
-	onRotate,
-	children,
-}) => {
+const DiagramElement: React.FC<ElementProps> = ({ id, children }) => {
+	const element = useAppSelector(state =>
+		getAllElements(state).find(el => el.id === id)
+	);
 	const nodeRef = useRef(null);
 	const [rotation, setRotation] = useState(0);
 
 	const handleDrag = (e: DraggableEvent, ui: DraggableData) => {
-		console.log(ui.deltaX, ui.deltaY);
-		onDrag({
-			x: x + ui.deltaX,
-			y: y + ui.deltaY,
+		console.log(ui.deltaX, ui.deltaY, e);
+		dragElement({
+			id,
+			x: ui.x,
+			y: ui.y,
 		});
 	};
 
-	const handleRotate = () => {
-		const newRotation = rotation + 45; // Adjust the rotation angle as needed
-		setRotation(newRotation);
-		onRotate(newRotation);
-	};
+	// const handleRotate = () => {
+	// 	const newRotation = rotation + 45; // Adjust the rotation angle as needed
+	// 	setRotation(newRotation);
+	// 	onRotate(newRotation);
+	// };
 
 	return (
 		<Draggable
 			nodeRef={nodeRef}
-			position={{ x, y }}
+			position={{
+				x: element ? element.x : 0,
+				y: element ? element.y : 0,
+			}}
 			onDrag={handleDrag}
 			bounds="parent"
 			positionOffset={{ x: "100%", y: "10%" }}
@@ -68,9 +69,9 @@ const DiagramElement: React.FC<ElementProps> = ({
 				}}
 				className="flex flex-col items-center space-y-2 p-2 bg-gray-100 rounded-md w-1/6">
 				{children}
-				{name && <div>{name}</div>}
+				{element?.name}
 				<div
-					onClick={handleRotate}
+					// onClick={handleRotate}
 					style={{
 						cursor: "pointer",
 						background: "gray",
@@ -85,42 +86,8 @@ const DiagramElement: React.FC<ElementProps> = ({
 };
 
 const Canvas: React.FC = () => {
-	const [elements, setElements] = useState<
-		Array<{
-			id: number;
-			x: number;
-			y: number;
-			rotation?: number;
-			name?: string;
-			element: any;
-		}>
-	>([]);
-
-	const handleDrag = (
-		index: number,
-		newPosition: { x: number; y: number }
-	) => {
-		setElements(prevElements => {
-			const updatedElements = [...prevElements];
-			updatedElements[index] = {
-				...updatedElements[index],
-				...newPosition,
-			};
-			return updatedElements;
-		});
-	};
-
-	const handleRotate = (index: number, newRotation: number) => {
-		console.log(newRotation);
-		setElements(prevElements => {
-			const updatedElements = [...prevElements];
-			updatedElements[index] = {
-				...updatedElements[index],
-				rotation: newRotation,
-			};
-			return updatedElements;
-		});
-	};
+	const elements = useAppSelector(getAllElements);
+	const dispatch = useAppDispatch();
 
 	return (
 		<div className="flex h-screen">
@@ -131,30 +98,25 @@ const Canvas: React.FC = () => {
 				<ScrollArea
 					className="flex flex-col items-center overflow-y-auto whitespace-nowrap rounded-md border"
 					aria-orientation="vertical">
-					{wokwiElements.map((element, index) => (
+					{wokwiElements.map((element, idx) => (
 						<div
-							key={index}
+							key={idx}
 							className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer select-none"
 							onClick={() => {
-								setElements(prevElements => [
-									...prevElements,
-									{
-										id: prevElements.length,
+								dispatch(
+									addElement({
+										id: idx,
 										x: 0,
 										y: 0,
-										element: element,
 										name: element.name,
-									},
-								]);
+										type: element.element,
+									})
+								);
 								toast("Element added", {
 									action: {
 										label: "Undo",
 										onClick: () => {
-											setElements(prevElements =>
-												prevElements.filter(
-													(_, i) => i !== index
-												)
-											);
+											dispatch(deleteElement(idx));
 										},
 									},
 									description: `Added ${element.name} to canvas`,
@@ -167,24 +129,12 @@ const Canvas: React.FC = () => {
 				</ScrollArea>
 			</div>
 			<div className="flex-1 relative bg-gray-200 overflow-hidden">
-				{elements.map((element, index) => (
+				{elements.map((element, idx) => (
 					<ContextMenu>
 						<ContextMenuTrigger>
-							<DiagramElement
-								id={element.id}
-								x={element.x}
-								y={element.y}
-								onDrag={newPosition =>
-									handleDrag(index, newPosition)
-								}
-								onRotate={newRotation =>
-									handleRotate(index, newRotation)
-								}
-								name={element.name}>
-								<div
-									key={index}
-									className="flex items-center space-x-2">
-									{element.element}
+							<DiagramElement key={idx} id={element.id}>
+								<div className="flex items-center space-x-2">
+									{element.type}
 								</div>
 								<wokwi-arduino-mega
 									pinInfo={[
@@ -212,16 +162,12 @@ const Canvas: React.FC = () => {
 										element.name
 									);
 									if (newName) {
-										setElements(prevElements => {
-											const updatedElements = [
-												...prevElements,
-											];
-											updatedElements[index] = {
-												...updatedElements[index],
+										dispatch(
+											editElementName({
+												id: element.id,
 												name: newName,
-											};
-											return updatedElements;
-										});
+											})
+										);
 									}
 								}}>
 								Rename
@@ -230,11 +176,7 @@ const Canvas: React.FC = () => {
 							<ContextMenuItem>Rotate</ContextMenuItem>
 							<ContextMenuItem
 								onClick={() =>
-									setElements(prevElements =>
-										prevElements.filter(
-											(_, i) => i !== index
-										)
-									)
+									dispatch(deleteElement(element.id))
 								}>
 								Delete
 							</ContextMenuItem>

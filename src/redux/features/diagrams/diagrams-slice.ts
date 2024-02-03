@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "@redux/store";
 import * as WokwiElements from "@wokwi/elements";
+import { number } from "zod";
 
 type WokwiElement<T> = Partial<T> & React.ClassAttributes<T>;
 
@@ -9,7 +10,7 @@ type WokwiElementMap = {
 };
 
 interface DiagramsElement {
-	id: string;
+	id: number;
 	x: number;
 	y: number;
 	name: string;
@@ -32,6 +33,7 @@ export const diagramsSlice = createSlice({
 			state.elements = action.payload;
 		},
 		addElement: (state, action) => {
+			console.log(action.payload);
 			state.elements.push(action.payload);
 		},
 		dragElement: (state, action) => {
@@ -52,12 +54,20 @@ export const diagramsSlice = createSlice({
 			}
 		},
 		deleteElement: (state, action) => {
-			state.elements = state.elements.filter(
-				e => e.id !== action.payload
-			);
+			const id = action.payload;
+			state.elements = state.elements.filter(e => e.id !== id);
 		},
 	},
 });
 
-export const { setElements, addElement, editElementName, deleteElement } =
-	diagramsSlice.actions;
+export const {
+	setElements,
+	addElement,
+	dragElement,
+	editElementName,
+	deleteElement,
+} = diagramsSlice.actions;
+
+export const getAllElements = (state: RootState) => state.diagrams.elements;
+
+export default diagramsSlice.reducer;
