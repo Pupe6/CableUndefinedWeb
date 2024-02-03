@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "@redux/store";
 import * as WokwiElements from "@wokwi/elements";
-import { number } from "zod";
 
 type WokwiElement<T> = Partial<T> & React.ClassAttributes<T>;
 

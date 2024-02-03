@@ -12,6 +12,17 @@ import {
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { toast } from "sonner";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -21,12 +32,27 @@ import {
 	editElementName,
 	deleteElement,
 } from "@/redux/features/diagrams/diagrams-slice";
+import { Button } from "@/components/ui/button";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { ItemIndicator } from "@radix-ui/react-context-menu";
+import { z } from "zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 interface ElementProps {
 	id: number;
 	children?: React.ReactNode;
 }
 
 const DiagramElement: React.FC<ElementProps> = ({ id, children }) => {
+	const dispatch = useAppDispatch();
 	const element = useAppSelector(state =>
 		getAllElements(state).find(el => el.id === id)
 	);
@@ -35,11 +61,13 @@ const DiagramElement: React.FC<ElementProps> = ({ id, children }) => {
 
 	const handleDrag = (e: DraggableEvent, ui: DraggableData) => {
 		console.log(ui.deltaX, ui.deltaY, e);
-		dragElement({
-			id,
-			x: ui.x,
-			y: ui.y,
-		});
+		dispatch(
+			dragElement({
+				id,
+				x: ui.x,
+				y: ui.y,
+			})
+		);
 	};
 
 	// const handleRotate = () => {
@@ -56,7 +84,7 @@ const DiagramElement: React.FC<ElementProps> = ({ id, children }) => {
 				y: element ? element.y : 0,
 			}}
 			onDrag={handleDrag}
-			bounds="parent"
+			// bounds="parent"
 			positionOffset={{ x: "100%", y: "10%" }}
 			key={id}>
 			<div
@@ -82,6 +110,79 @@ const DiagramElement: React.FC<ElementProps> = ({ id, children }) => {
 				</div>
 			</div>
 		</Draggable>
+	);
+};
+
+const schema = z.object({
+	name: z.string(),
+});
+
+type FormValues = z.infer<typeof schema>;
+
+const RenameElementForm = ({
+	id,
+	initialName,
+}: {
+	id: number;
+	initialName: string;
+}) => {
+	const dispatch = useAppDispatch();
+
+	const form = useForm<FormValues>({
+		mode: "onSubmit",
+		resolver: zodResolver(schema),
+	});
+
+	const onSubmit: SubmitHandler<FormValues> = async (data: FormValues) => {
+		dispatch(
+			editElementName({
+				id: id,
+				name: data.name,
+			})
+		);
+	};
+
+	return (
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)}>
+				<FormField
+					control={form.control}
+					name="name"
+					render={({ field, formState }) => (
+						<FormItem>
+							<FormControl>
+								<Input
+									id="name"
+									type="text"
+									autoCapitalize="none"
+									autoComplete="off"
+									autoCorrect="off"
+									placeholder="Enter a new name"
+									className="w-full"
+									defaultValue={initialName}
+									disabled={false}
+									{...field}
+								/>
+							</FormControl>
+							<FormMessage className="text-red-500 pt-1">
+								{formState.errors.name?.message}
+							</FormMessage>
+						</FormItem>
+					)}
+				/>
+
+				<DialogFooter className="flex justify-end items-center space-x-2 pt-2 bg-gray-100 rounded-b-md">
+					<DialogClose asChild>
+						<Button type="button" variant="secondary">
+							Close
+						</Button>
+					</DialogClose>
+					<Button type="submit" size="sm" className="px-3">
+						Rename
+					</Button>
+				</DialogFooter>
+			</form>
+		</Form>
 	);
 };
 
@@ -130,58 +231,64 @@ const Canvas: React.FC = () => {
 			</div>
 			<div className="flex-1 relative bg-gray-200 overflow-hidden">
 				{elements.map((element, idx) => (
-					<ContextMenu>
-						<ContextMenuTrigger>
-							<DiagramElement key={idx} id={element.id}>
-								<div className="flex items-center space-x-2">
-									{element.type}
-								</div>
-								<wokwi-arduino-mega
-									pinInfo={[
-										{
-											name: "GND",
-											x: 1,
-											y: 2,
-											signals: [
-												{
-													type: "i2c",
-													signal: "SDA",
-													bus: 1,
-												},
-											],
-										},
-									]}
-								/>
-							</DiagramElement>
-						</ContextMenuTrigger>
-						<ContextMenuContent>
-							<ContextMenuItem
-								onClick={() => {
-									const newName = prompt(
-										"Enter new name",
-										element.name
-									);
-									if (newName) {
-										dispatch(
-											editElementName({
-												id: element.id,
-												name: newName,
-											})
-										);
+					<Dialog>
+						<ContextMenu>
+							<ContextMenuTrigger>
+								<DiagramElement key={idx} id={element.id}>
+									<div className="flex items-center space-x-2">
+										{element.type}
+									</div>
+									<wokwi-arduino-mega
+										pinInfo={[
+											{
+												name: "GND",
+												x: 1,
+												y: 2,
+												signals: [
+													{
+														type: "i2c",
+														signal: "SDA",
+														bus: 1,
+													},
+												],
+											},
+										]}
+									/>
+								</DiagramElement>
+							</ContextMenuTrigger>
+							<ContextMenuContent>
+								<ContextMenuItem>
+									<DialogTrigger asChild>
+										<ContextMenuItem>
+											Rename
+										</ContextMenuItem>
+									</DialogTrigger>
+								</ContextMenuItem>
+								<ContextMenuItem>Move up</ContextMenuItem>
+								<ContextMenuItem>Rotate</ContextMenuItem>
+								<ContextMenuItem
+									onClick={() =>
+										dispatch(deleteElement(element.id))
 									}
-								}}>
-								Rename
-							</ContextMenuItem>
-							<ContextMenuItem>Move up</ContextMenuItem>
-							<ContextMenuItem>Rotate</ContextMenuItem>
-							<ContextMenuItem
-								onClick={() =>
-									dispatch(deleteElement(element.id))
-								}>
-								Delete
-							</ContextMenuItem>
-						</ContextMenuContent>
-					</ContextMenu>
+									// make it look better
+									className="hover:text-red-500 cursor-pointer">
+									Remove
+								</ContextMenuItem>
+							</ContextMenuContent>
+						</ContextMenu>
+						<DialogContent className="sm:max-w-md">
+							<DialogHeader>
+								<DialogTitle>Rename Element</DialogTitle>
+								<DialogDescription>
+									Enter a new name for the element
+								</DialogDescription>
+							</DialogHeader>
+							<RenameElementForm
+								id={element.id}
+								initialName={element.name}
+							/>
+						</DialogContent>
+					</Dialog>
 				))}
 			</div>
 		</div>
