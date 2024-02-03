@@ -26,6 +26,8 @@ import { Label } from "@/components/ui/label";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
+	toggleGrid,
+	getShowGrid,
 	getAllElements,
 	addElement,
 	dragElement,
@@ -34,7 +36,6 @@ import {
 } from "@/redux/features/diagrams/diagrams-slice";
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { ItemIndicator } from "@radix-ui/react-context-menu";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,9 +44,15 @@ import {
 	FormControl,
 	FormField,
 	FormItem,
-	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { CheckboxItem, ItemIndicator } from "@radix-ui/react-context-menu";
+import { CheckIcon } from "lucide-react";
+
+const strypesCanvasStyles = `bg-gradient-to-r from-transparent via-transparent to-rgba(211, 211, 211, 0.5) bg-repeat-x w-40 h-40
+bg-gradient-to-r from-rgba(211, 211, 211, 0.5) to-transparent bg-repeat-x h-1 w-8
+bg-gradient-to-b from-transparent via-transparent to-rgba(211, 211, 211, 0.5) bg-repeat-y h-40 w-40
+bg-gradient-to-b from-rgba(211, 211, 211, 0.5) to-transparent bg-repeat-y h-8 w-1`;
 interface ElementProps {
 	id: number;
 	children?: React.ReactNode;
@@ -188,6 +195,7 @@ const RenameElementForm = ({
 
 const Canvas: React.FC = () => {
 	const elements = useAppSelector(getAllElements);
+	const showGrid = useAppSelector(getShowGrid);
 	const dispatch = useAppDispatch();
 
 	return (
@@ -229,7 +237,10 @@ const Canvas: React.FC = () => {
 					))}
 				</ScrollArea>
 			</div>
-			<div className="flex-1 relative bg-gray-200 overflow-hidden">
+			<div
+				className={`flex-1 relative overflow-hidden ${
+					showGrid ? strypesCanvasStyles : ""
+				}`}>
 				{elements.map((element, idx) => (
 					<Dialog>
 						<ContextMenu>
@@ -291,6 +302,15 @@ const Canvas: React.FC = () => {
 					</Dialog>
 				))}
 			</div>
+			{/* <CheckboxItem
+							className="ContextMenuCheckboxItem"
+							checked={showGrid}
+							onCheckedChange={() => dispatch(toggleGrid())}>
+							<ItemIndicator className="ContextMenuItemIndicator">
+								<CheckIcon />
+							</ItemIndicator>
+							Show Grid <div className="RightSlot">⌘+'</div>
+						</CheckboxItem> */}
 		</div>
 	);
 };

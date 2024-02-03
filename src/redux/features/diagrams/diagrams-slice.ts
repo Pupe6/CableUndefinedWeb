@@ -18,16 +18,22 @@ interface DiagramsElement {
 
 interface DiagramsState {
 	elements: DiagramsElement[];
+	showGrid: boolean;
 }
 
 const initialState: DiagramsState = {
 	elements: [],
+	showGrid: localStorage.getItem("showGrid") === "true",
 };
 
 export const diagramsSlice = createSlice({
 	name: "diagrams",
 	initialState,
 	reducers: {
+		toggleGrid: state => {
+			state.showGrid = !state.showGrid;
+			localStorage.setItem("showGrid", state.showGrid ? "true" : "false");
+		},
 		setElements: (state, action) => {
 			state.elements = action.payload;
 		},
@@ -61,6 +67,7 @@ export const diagramsSlice = createSlice({
 
 export const {
 	setElements,
+	toggleGrid,
 	addElement,
 	dragElement,
 	editElementName,
@@ -68,5 +75,6 @@ export const {
 } = diagramsSlice.actions;
 
 export const getAllElements = (state: RootState) => state.diagrams.elements;
+export const getShowGrid = (state: RootState) => state.diagrams.showGrid;
 
 export default diagramsSlice.reducer;
