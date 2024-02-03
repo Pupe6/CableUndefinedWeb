@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
 import "@wokwi/elements";
 import { wokwiElements } from "../../../utils/extract-wokwi-elements";
@@ -12,8 +12,10 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@radix-ui/react-context-menu";
+import { toast } from "sonner";
 
 interface ElementProps {
+	id: number;
 	x: number;
 	y: number;
 	name?: string;
@@ -22,7 +24,8 @@ interface ElementProps {
 	children?: React.ReactNode;
 }
 
-const RotatableElement: React.FC<ElementProps> = ({
+const DiagramElement: React.FC<ElementProps> = ({
+	id,
 	x,
 	y,
 	name,
@@ -30,9 +33,11 @@ const RotatableElement: React.FC<ElementProps> = ({
 	onRotate,
 	children,
 }) => {
+	const nodeRef = useRef(null);
 	const [rotation, setRotation] = useState(0);
 
 	const handleDrag = (e: DraggableEvent, ui: DraggableData) => {
+		console.log(ui.deltaX, ui.deltaY);
 		onDrag({
 			x: x + ui.deltaX,
 			y: y + ui.deltaY,
@@ -46,8 +51,15 @@ const RotatableElement: React.FC<ElementProps> = ({
 	};
 
 	return (
-		<Draggable position={{ x, y }} onDrag={handleDrag}>
+		<Draggable
+			nodeRef={nodeRef}
+			position={{ x, y }}
+			onDrag={handleDrag}
+			bounds="parent"
+			positionOffset={{ x: "100%", y: "10%" }}
+			key={id}>
 			<div
+				ref={nodeRef}
 				style={{
 					transform: `rotate(${rotation}deg)`,
 					position: "absolute",
@@ -111,19 +123,19 @@ const Canvas: React.FC = () => {
 	};
 
 	return (
-		<>
-			<div className="flex flex-col h-screen">
+		<div className="flex h-screen">
+			<div className="flex flex-col h-screen w-fit-content p-2 space-y-2">
 				<h1 className="text-2xl font-bold text-center p-2 bg-gray-100 rounded-md">
 					Choose Elements:
 				</h1>
 				<ScrollArea
-					className="flex flex-col items-center space-x-0.5 space-y-2 w-fit overflow-y-auto whitespace-nowrap rounded-md border"
+					className="flex flex-col items-center overflow-y-auto whitespace-nowrap rounded-md border"
 					aria-orientation="vertical">
 					{wokwiElements.map((element, index) => (
 						<div
 							key={index}
 							className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer select-none"
-							onClick={() =>
+							onClick={() => {
 								setElements(prevElements => [
 									...prevElements,
 									{
@@ -133,19 +145,33 @@ const Canvas: React.FC = () => {
 										element: element,
 										name: element.name,
 									},
-								])
-							}>
+								]);
+								toast("Element added", {
+									action: {
+										label: "Undo",
+										onClick: () => {
+											setElements(prevElements =>
+												prevElements.filter(
+													(_, i) => i !== index
+												)
+											);
+										},
+									},
+									description: `Added ${element.name} to canvas`,
+									closeButton: true,
+								});
+							}}>
 							{element.name}
 						</div>
 					))}
 				</ScrollArea>
 			</div>
-			<div>
+			<div className="flex-1 relative bg-gray-200 overflow-hidden">
 				{elements.map((element, index) => (
 					<ContextMenu>
 						<ContextMenuTrigger>
-							<RotatableElement
-								key={element.id}
+							<DiagramElement
+								id={element.id}
 								x={element.x}
 								y={element.y}
 								onDrag={newPosition =>
@@ -160,7 +186,23 @@ const Canvas: React.FC = () => {
 									className="flex items-center space-x-2">
 									{element.element}
 								</div>
-							</RotatableElement>
+								<wokwi-arduino-mega
+									pinInfo={[
+										{
+											name: "GND",
+											x: 1,
+											y: 2,
+											signals: [
+												{
+													type: "i2c",
+													signal: "SDA",
+													bus: 1,
+												},
+											],
+										},
+									]}
+								/>
+							</DiagramElement>
 						</ContextMenuTrigger>
 						<ContextMenuContent>
 							<ContextMenuItem
@@ -200,7 +242,7 @@ const Canvas: React.FC = () => {
 					</ContextMenu>
 				))}
 			</div>
-		</>
+		</div>
 	);
 };
 

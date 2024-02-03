@@ -14,6 +14,7 @@ import { ThemeProvider } from "../components/theme-provider";
 import { ReduxProvider } from "../redux/provider";
 
 import { Toaster } from "../components/ui/toaster";
+import { Toaster as SonnerToaster } from "sonner";
 
 export default function RootLayout({
 	children,
@@ -31,6 +32,7 @@ export default function RootLayout({
 					<ReduxProvider>{children}</ReduxProvider>
 				</ThemeProvider>
 				<Toaster />
+				<SonnerToaster />
 			</body>
 		</html>
 	);
