@@ -49,10 +49,6 @@ import {
 import { CheckboxItem, ItemIndicator } from "@radix-ui/react-context-menu";
 import { CheckIcon } from "lucide-react";
 
-const strypesCanvasStyles = `bg-gradient-to-r from-transparent via-transparent to-rgba(211, 211, 211, 0.5) bg-repeat-x w-40 h-40
-bg-gradient-to-r from-rgba(211, 211, 211, 0.5) to-transparent bg-repeat-x h-1 w-8
-bg-gradient-to-b from-transparent via-transparent to-rgba(211, 211, 211, 0.5) bg-repeat-y h-40 w-40
-bg-gradient-to-b from-rgba(211, 211, 211, 0.5) to-transparent bg-repeat-y h-8 w-1`;
 interface ElementProps {
 	id: number;
 	children?: React.ReactNode;
@@ -178,7 +174,7 @@ const RenameElementForm = ({
 					)}
 				/>
 
-				<DialogFooter className="flex justify-end items-center space-x-2 pt-2 bg-gray-100 rounded-b-md">
+				<DialogFooter className="flex justify-end items-center space-x-2 mt-2 bg-gray-100 rounded-b-md">
 					<DialogClose asChild>
 						<Button type="button" variant="secondary">
 							Close
@@ -200,7 +196,7 @@ const Canvas: React.FC = () => {
 
 	return (
 		<div className="flex h-screen">
-			<div className="flex flex-col h-screen w-fit-content p-2 space-y-2">
+			<div className="flex flex-col w-fit-content p-2 space-y-2">
 				<h1 className="text-2xl font-bold text-center p-2 bg-gray-100 rounded-md">
 					Choose Elements:
 				</h1>
@@ -238,79 +234,103 @@ const Canvas: React.FC = () => {
 				</ScrollArea>
 			</div>
 			<div
-				className={`flex-1 relative overflow-hidden ${
-					showGrid ? strypesCanvasStyles : ""
+				className={`flex-1 relative h-screen  ${
+					showGrid ? "scene-grid" : ""
 				}`}>
-				{elements.map((element, idx) => (
-					<Dialog>
-						<ContextMenu>
-							<ContextMenuTrigger>
-								<DiagramElement key={idx} id={element.id}>
-									<div className="flex items-center space-x-2">
-										{element.type}
-									</div>
-									<wokwi-arduino-mega
-										pinInfo={[
-											{
-												name: "GND",
-												x: 1,
-												y: 2,
-												signals: [
-													{
-														type: "i2c",
-														signal: "SDA",
-														bus: 1,
-													},
-												],
-											},
-										]}
-									/>
-								</DiagramElement>
-							</ContextMenuTrigger>
-							<ContextMenuContent>
-								<ContextMenuItem>
-									<DialogTrigger asChild>
-										<ContextMenuItem>
-											Rename
-										</ContextMenuItem>
-									</DialogTrigger>
-								</ContextMenuItem>
-								<ContextMenuItem>Move up</ContextMenuItem>
-								<ContextMenuItem>Rotate</ContextMenuItem>
-								<ContextMenuItem
-									onClick={() =>
-										dispatch(deleteElement(element.id))
-									}
-									// make it look better
-									className="hover:text-red-500 cursor-pointer">
-									Remove
-								</ContextMenuItem>
-							</ContextMenuContent>
-						</ContextMenu>
-						<DialogContent className="sm:max-w-md">
-							<DialogHeader>
-								<DialogTitle>Rename Element</DialogTitle>
-								<DialogDescription>
-									Enter a new name for the element
-								</DialogDescription>
-							</DialogHeader>
-							<RenameElementForm
-								id={element.id}
-								initialName={element.name}
-							/>
-						</DialogContent>
-					</Dialog>
-				))}
-			</div>
-			{/* <CheckboxItem
+				<ContextMenu>
+					<ContextMenuTrigger>
+						<div
+							// make it take up the rest of the space
+							className={"flex-1 relative h-screen"}>
+							{elements.map((element, idx) => (
+								<Dialog>
+									<ContextMenu>
+										<ContextMenuTrigger>
+											<DiagramElement
+												key={idx}
+												id={element.id}>
+												<div className="flex items-center space-x-2">
+													{element.type}
+												</div>
+												<wokwi-arduino-mega
+													pinInfo={[
+														{
+															name: "GND",
+															x: 1,
+															y: 2,
+															signals: [
+																{
+																	type: "i2c",
+																	signal: "SDA",
+																	bus: 1,
+																},
+															],
+														},
+													]}
+												/>
+											</DiagramElement>
+										</ContextMenuTrigger>
+										<ContextMenuContent>
+											<ContextMenuItem>
+												<DialogTrigger asChild>
+													<ContextMenuItem>
+														Rename
+													</ContextMenuItem>
+												</DialogTrigger>
+											</ContextMenuItem>
+											<ContextMenuItem>
+												Move up
+											</ContextMenuItem>
+											<ContextMenuItem>
+												Rotate
+											</ContextMenuItem>
+											<ContextMenuItem
+												onClick={() =>
+													dispatch(
+														deleteElement(
+															element.id
+														)
+													)
+												}
+												// make it look better
+												className="hover:text-red-500 cursor-pointer">
+												Remove
+											</ContextMenuItem>
+										</ContextMenuContent>
+									</ContextMenu>
+									<DialogContent className="sm:max-w-md">
+										<DialogHeader>
+											<DialogTitle>
+												Rename Element
+											</DialogTitle>
+											<DialogDescription>
+												Enter a new name for the element
+											</DialogDescription>
+										</DialogHeader>
+										<RenameElementForm
+											id={element.id}
+											initialName={element.name}
+										/>
+									</DialogContent>
+								</Dialog>
+							))}
+						</div>
+					</ContextMenuTrigger>
+					<ContextMenuContent>
+						<CheckboxItem
 							className="ContextMenuCheckboxItem"
 							checked={showGrid}
 							onCheckedChange={() => dispatch(toggleGrid())}>
-							<ItemIndicator className="ContextMenuItemIndicator">
-								<CheckIcon />
-							</ItemIndicator>
-							Show Grid <div className="RightSlot">⌘+'</div>
-						</CheckboxItem> */}
+							<div className="flex items-center space-x-2">
+								<ItemIndicator className="ContextMenuItemIndicator">
+									<CheckIcon />
+								</ItemIndicator>
+								Show Grid <div className="RightSlot">⌘+'</div>
+							</div>
+						</CheckboxItem>
+					</ContextMenuContent>
+				</ContextMenu>
+			</div>
 		</div>
 	);
 };
