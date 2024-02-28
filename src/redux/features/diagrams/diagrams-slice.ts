@@ -1,6 +1,7 @@
+"use client";
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "@redux/store";
-import * as WokwiElements from "@wokwi/elements";
+import * as WokwiElements from "@b.borisov/cu-elements";
 
 type WokwiElement<T> = Partial<T> & React.ClassAttributes<T>;
 
@@ -14,6 +15,10 @@ interface DiagramsElement {
 	y: number;
 	name: string;
 	type: keyof WokwiElementMap;
+	angle: number;
+	locked: boolean;
+	version: number;
+	updated: number;
 }
 
 interface DiagramsState {
@@ -42,18 +47,14 @@ export const diagramsSlice = createSlice({
 			state.elements.push(action.payload);
 		},
 		dragElement: (state, action) => {
-			const element = state.elements.find(
-				e => e.id === action.payload.id
-			);
+			const element = state.elements.find(e => e.id === action.payload.id);
 			if (element) {
 				element.x = action.payload.x;
 				element.y = action.payload.y;
 			}
 		},
 		editElementName: (state, action) => {
-			const element = state.elements.find(
-				e => e.id === action.payload.id
-			);
+			const element = state.elements.find(e => e.id === action.payload.id);
 			if (element) {
 				element.name = action.payload.name;
 			}

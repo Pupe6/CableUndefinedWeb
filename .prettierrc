@@ -1,6 +1,6 @@
 {
 	"arrowParens": "avoid",
-	"tabWidth": 4,
+	"tabWidth": 2,
 	"bracketSpacing": true,
 	"useTabs": true,
 	"singleQuote": false,

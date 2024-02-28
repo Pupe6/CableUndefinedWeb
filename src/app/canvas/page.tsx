@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
 import { wokwiElements } from "../../../utils/extract-wokwi-elements";
+import "@b.borisov/cu-elements";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -193,6 +194,36 @@ const Canvas: React.FC = () => {
 	const elements = useAppSelector(getAllElements);
 	const showGrid = useAppSelector(getShowGrid);
 	const dispatch = useAppDispatch();
+	useEffect(() => {
+		const event = new CustomEvent("pin-click", {
+			detail: { someKey: "someValue" },
+		});
+
+		document.dispatchEvent(event);
+
+		return () => {
+			document.removeEventListener(
+				"pin-click",
+				handleCustomEvent as EventListener
+			);
+		};
+	}, []);
+
+	const handleCustomEvent = (event: CustomEvent) => {
+		console.log("Custom event caught!", event.detail);
+		// Do something with the event data
+	};
+
+	useEffect(() => {
+		document.addEventListener("pin-click", handleCustomEvent as EventListener);
+
+		return () => {
+			document.removeEventListener(
+				"pin-click",
+				handleCustomEvent as EventListener
+			);
+		};
+	}, []);
 
 	return (
 		<div className="flex h-screen">
@@ -234,64 +265,44 @@ const Canvas: React.FC = () => {
 				</ScrollArea>
 			</div>
 			<div
-				className={`flex-1 relative h-screen  ${
-					showGrid ? "scene-grid" : ""
-				}`}>
-				<ContextMenu>
-					<ContextMenuTrigger>
-						<div
-							// make it take up the rest of the space
-							className={"flex-1 relative h-screen"}>
+				className={`flex-1 relative h-screen  ${showGrid ? "scene-grid" : ""}`}>
+				<div className="tools">
+					<button
+						onClick={() => {
+							console.log("zoom	");
+						}}>
+						+
+					</button>
+					<button>-</button>
+					<button>x</button>
+				</div>
+				<div className="flex-1 relative h-screen">
+					<ContextMenu>
+						<ContextMenuTrigger>
 							{elements.map((element, idx) => (
+								// <KeepScale>
 								<Dialog>
 									<ContextMenu>
 										<ContextMenuTrigger>
-											<DiagramElement
-												key={idx}
-												id={element.id}>
+											<DiagramElement key={idx} id={element.id}>
 												<div className="flex items-center space-x-2">
 													{element.type}
 												</div>
-												<wokwi-arduino-mega
-													pinInfo={[
-														{
-															name: "GND",
-															x: 1,
-															y: 2,
-															signals: [
-																{
-																	type: "i2c",
-																	signal: "SDA",
-																	bus: 1,
-																},
-															],
-														},
-													]}
-												/>
+												<wokwi-show-pins pinRadius={6}>
+													<wokwi-breadboard />
+												</wokwi-show-pins>
 											</DiagramElement>
 										</ContextMenuTrigger>
 										<ContextMenuContent>
 											<ContextMenuItem>
 												<DialogTrigger asChild>
-													<ContextMenuItem>
-														Rename
-													</ContextMenuItem>
+													<ContextMenuItem>Rename</ContextMenuItem>
 												</DialogTrigger>
 											</ContextMenuItem>
-											<ContextMenuItem>
-												Move up
-											</ContextMenuItem>
-											<ContextMenuItem>
-												Rotate
-											</ContextMenuItem>
+											<ContextMenuItem>Move up</ContextMenuItem>
+											<ContextMenuItem>Rotate</ContextMenuItem>
 											<ContextMenuItem
-												onClick={() =>
-													dispatch(
-														deleteElement(
-															element.id
-														)
-													)
-												}
+												onClick={() => dispatch(deleteElement(element.id))}
 												// make it look better
 												className="hover:text-red-500 cursor-pointer">
 												Remove
@@ -300,9 +311,7 @@ const Canvas: React.FC = () => {
 									</ContextMenu>
 									<DialogContent className="sm:max-w-md">
 										<DialogHeader>
-											<DialogTitle>
-												Rename Element
-											</DialogTitle>
+											<DialogTitle>Rename Element</DialogTitle>
 											<DialogDescription>
 												Enter a new name for the element
 											</DialogDescription>
@@ -313,23 +322,24 @@ const Canvas: React.FC = () => {
 										/>
 									</DialogContent>
 								</Dialog>
+								// </KeepScale>
 							))}
-						</div>
-					</ContextMenuTrigger>
-					<ContextMenuContent>
-						<CheckboxItem
-							className="ContextMenuCheckboxItem"
-							checked={showGrid}
-							onCheckedChange={() => dispatch(toggleGrid())}>
-							<div className="flex items-center space-x-2">
-								<ItemIndicator className="ContextMenuItemIndicator">
-									<CheckIcon />
-								</ItemIndicator>
-								Show Grid <div className="RightSlot">⌘+'</div>
-							</div>
-						</CheckboxItem>
-					</ContextMenuContent>
-				</ContextMenu>
+						</ContextMenuTrigger>
+						<ContextMenuContent>
+							<CheckboxItem
+								className="ContextMenuCheckboxItem"
+								checked={showGrid}
+								onCheckedChange={() => dispatch(toggleGrid())}>
+								<div className="flex items-center space-x-2">
+									<ItemIndicator className="ContextMenuItemIndicator">
+										<CheckIcon />
+									</ItemIndicator>
+									Show Grid <div className="RightSlot">⌘+'</div>
+								</div>
+							</CheckboxItem>
+						</ContextMenuContent>
+					</ContextMenu>
+				</div>
 			</div>
 		</div>
 	);
