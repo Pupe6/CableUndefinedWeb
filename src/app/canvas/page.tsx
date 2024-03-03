@@ -1,29 +1,17 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
+import React, { useEffect } from "react";
 import { wokwiElements } from "../../../utils/extract-wokwi-elements";
 import "@b.borisov/cu-elements";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
 	ContextMenu,
+	ContextMenuCheckboxItem,
 	ContextMenuContent,
-	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { toast } from "sonner";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -35,179 +23,15 @@ import {
 	editElementName,
 	deleteElement,
 } from "@/redux/features/diagrams/diagrams-slice";
-import { Button } from "@/components/ui/button";
-import { DialogClose } from "@radix-ui/react-dialog";
-import { z } from "zod";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormMessage,
-} from "@/components/ui/form";
 import { CheckboxItem, ItemIndicator } from "@radix-ui/react-context-menu";
 import { CheckIcon } from "lucide-react";
-
-interface ElementProps {
-	id: number;
-	children?: React.ReactNode;
-}
-
-const DiagramElement: React.FC<ElementProps> = ({ id, children }) => {
-	const dispatch = useAppDispatch();
-	const element = useAppSelector(state =>
-		getAllElements(state).find(el => el.id === id)
-	);
-	const nodeRef = useRef(null);
-	const [rotation, setRotation] = useState(0);
-
-	const handleDrag = (e: DraggableEvent, ui: DraggableData) => {
-		console.log(ui.deltaX, ui.deltaY, e);
-		dispatch(
-			dragElement({
-				id,
-				x: ui.x,
-				y: ui.y,
-			})
-		);
-	};
-
-	// const handleRotate = () => {
-	// 	const newRotation = rotation + 45; // Adjust the rotation angle as needed
-	// 	setRotation(newRotation);
-	// 	onRotate(newRotation);
-	// };
-
-	return (
-		<Draggable
-			nodeRef={nodeRef}
-			position={{
-				x: element ? element.x : 0,
-				y: element ? element.y : 0,
-			}}
-			onDrag={handleDrag}
-			// bounds="parent"
-			positionOffset={{ x: "100%", y: "10%" }}
-			key={id}>
-			<div
-				ref={nodeRef}
-				style={{
-					transform: `rotate(${rotation}deg)`,
-					position: "absolute",
-					transition: "transform 150ms ease",
-					cursor: "move",
-				}}
-				className="flex flex-col items-center space-y-2 p-2 bg-gray-100 rounded-md w-1/6">
-				{children}
-				{element?.name}
-				<div
-					// onClick={handleRotate}
-					style={{
-						cursor: "pointer",
-						background: "gray",
-						padding: "5px",
-						borderRadius: "5px",
-					}}>
-					Rotate
-				</div>
-			</div>
-		</Draggable>
-	);
-};
-
-const schema = z.object({
-	name: z.string(),
-});
-
-type FormValues = z.infer<typeof schema>;
-
-const RenameElementForm = ({
-	id,
-	initialName,
-}: {
-	id: number;
-	initialName: string;
-}) => {
-	const dispatch = useAppDispatch();
-
-	const form = useForm<FormValues>({
-		mode: "onSubmit",
-		resolver: zodResolver(schema),
-	});
-
-	const onSubmit: SubmitHandler<FormValues> = async (data: FormValues) => {
-		dispatch(
-			editElementName({
-				id: id,
-				name: data.name,
-			})
-		);
-	};
-
-	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)}>
-				<FormField
-					control={form.control}
-					name="name"
-					render={({ field, formState }) => (
-						<FormItem>
-							<FormControl>
-								<Input
-									id="name"
-									type="text"
-									autoCapitalize="none"
-									autoComplete="off"
-									autoCorrect="off"
-									placeholder="Enter a new name"
-									className="w-full"
-									defaultValue={initialName}
-									disabled={false}
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage className="text-red-500 pt-1">
-								{formState.errors.name?.message}
-							</FormMessage>
-						</FormItem>
-					)}
-				/>
-
-				<DialogFooter className="flex justify-end items-center space-x-2 mt-2 bg-gray-100 rounded-b-md">
-					<DialogClose asChild>
-						<Button type="button" variant="secondary">
-							Close
-						</Button>
-					</DialogClose>
-					<Button type="submit" size="sm" className="px-3">
-						Rename
-					</Button>
-				</DialogFooter>
-			</form>
-		</Form>
-	);
-};
+import DiagramElement from "@/components/canvas/diagram-element";
+import ElementContextMenu from "@/components/canvas/element-context.menu";
 
 const Canvas: React.FC = () => {
 	const elements = useAppSelector(getAllElements);
 	const showGrid = useAppSelector(getShowGrid);
 	const dispatch = useAppDispatch();
-	useEffect(() => {
-		const event = new CustomEvent("pin-click", {
-			detail: { someKey: "someValue" },
-		});
-
-		document.dispatchEvent(event);
-
-		return () => {
-			document.removeEventListener(
-				"pin-click",
-				handleCustomEvent as EventListener
-			);
-		};
-	}, []);
 
 	const handleCustomEvent = (event: CustomEvent) => {
 		console.log("Custom event caught!", event.detail);
@@ -264,82 +88,31 @@ const Canvas: React.FC = () => {
 					))}
 				</ScrollArea>
 			</div>
-			<div
-				className={`flex-1 relative h-screen  ${showGrid ? "scene-grid" : ""}`}>
-				<div className="tools">
-					<button
-						onClick={() => {
-							console.log("zoom	");
-						}}>
-						+
-					</button>
-					<button>-</button>
-					<button>x</button>
-				</div>
-				<div className="flex-1 relative h-screen">
-					<ContextMenu>
-						<ContextMenuTrigger>
+			<div className="flex-1 relative h-screen">
+				<ContextMenu>
+					<ContextMenuTrigger>
+						<div
+							className={`flex-1 relative h-screen ${
+								showGrid ? "scene-grid" : ""
+							}`}>
 							{elements.map((element, idx) => (
 								// <KeepScale>
-								<Dialog>
-									<ContextMenu>
-										<ContextMenuTrigger>
-											<DiagramElement key={idx} id={element.id}>
-												<div className="flex items-center space-x-2">
-													{element.type}
-												</div>
-												<wokwi-show-pins pinRadius={6}>
-													<wokwi-breadboard />
-												</wokwi-show-pins>
-											</DiagramElement>
-										</ContextMenuTrigger>
-										<ContextMenuContent>
-											<ContextMenuItem>
-												<DialogTrigger asChild>
-													<ContextMenuItem>Rename</ContextMenuItem>
-												</DialogTrigger>
-											</ContextMenuItem>
-											<ContextMenuItem>Move up</ContextMenuItem>
-											<ContextMenuItem>Rotate</ContextMenuItem>
-											<ContextMenuItem
-												onClick={() => dispatch(deleteElement(element.id))}
-												// make it look better
-												className="hover:text-red-500 cursor-pointer">
-												Remove
-											</ContextMenuItem>
-										</ContextMenuContent>
-									</ContextMenu>
-									<DialogContent className="sm:max-w-md">
-										<DialogHeader>
-											<DialogTitle>Rename Element</DialogTitle>
-											<DialogDescription>
-												Enter a new name for the element
-											</DialogDescription>
-										</DialogHeader>
-										<RenameElementForm
-											id={element.id}
-											initialName={element.name}
-										/>
-									</DialogContent>
-								</Dialog>
+								<ElementContextMenu key={idx} element={element} idx={idx} />
+
 								// </KeepScale>
 							))}
-						</ContextMenuTrigger>
-						<ContextMenuContent>
-							<CheckboxItem
-								className="ContextMenuCheckboxItem"
-								checked={showGrid}
-								onCheckedChange={() => dispatch(toggleGrid())}>
-								<div className="flex items-center space-x-2">
-									<ItemIndicator className="ContextMenuItemIndicator">
-										<CheckIcon />
-									</ItemIndicator>
-									Show Grid <div className="RightSlot">⌘+'</div>
-								</div>
-							</CheckboxItem>
-						</ContextMenuContent>
-					</ContextMenu>
-				</div>
+						</div>
+					</ContextMenuTrigger>
+					<ContextMenuContent>
+						<ContextMenuCheckboxItem
+							checked={showGrid}
+							onCheckedChange={() => dispatch(toggleGrid())}>
+							<div className="flex items-center space-x-2">
+								Show Grid <div className="RightSlot">⌘+'</div>
+							</div>
+						</ContextMenuCheckboxItem>
+					</ContextMenuContent>
+				</ContextMenu>
 			</div>
 		</div>
 	);

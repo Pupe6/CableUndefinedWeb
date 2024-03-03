@@ -2,8 +2,8 @@ lockfileVersion: '6.0'
 
 dependencies:
   '@b.borisov/cu-elements':
-    specifier: ^1.4.13
-    version: 1.4.13
+    specifier: ^1.4.14
+    version: 1.4.14
   '@hookform/resolvers':
     specifier: ^3.3.2
     version: 3.3.2(react-hook-form@7.47.0)
@@ -132,8 +132,8 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
 
-  /@b.borisov/cu-elements@1.4.13:
-    resolution: {integrity: sha512-+sP4Mb2M+tY+Rcb2zE7BU7wNJaDi++o4zckNMC1dFFs7Z7AjnXxERIKpI5wtctm8wTOtEQpY3tenoumJmUsPBA==}
+  /@b.borisov/cu-elements@1.4.14:
+    resolution: {integrity: sha512-Yocv0/tN8QE0J7+RU643xZynk+SB/HDGEuAdwc7s6fpv1EpaGl+e4HBXy+ycOCm8F3VjJygRKaLaLJ67z5lLCw==}
     engines: {node: '>=16'}
     dependencies:
       '@types/react': 18.2.28
