@@ -33,6 +33,9 @@ import DiagramElement from "@/components/canvas/diagram-element";
 import { useAppDispatch } from "@/redux/hooks";
 import { deleteElement } from "@/redux/features/diagrams/diagrams-slice";
 
+import "@b.borisov/cu-elements";
+import { AnalogJoystickElement } from "@b.borisov/cu-elements";
+
 const schema = z.object({
 	name: z.string(),
 });
@@ -51,6 +54,9 @@ const RenameElementForm = ({
 	const form = useForm<FormValues>({
 		mode: "onSubmit",
 		resolver: zodResolver(schema),
+		defaultValues: {
+			name: initialName,
+		},
 	});
 
 	const onSubmit: SubmitHandler<FormValues> = async (data: FormValues) => {
@@ -79,7 +85,6 @@ const RenameElementForm = ({
 									autoCorrect="off"
 									placeholder="Enter a new name"
 									className="w-full"
-									defaultValue={initialName}
 									disabled={false}
 									{...field}
 								/>
@@ -91,15 +96,17 @@ const RenameElementForm = ({
 					)}
 				/>
 
-				<DialogFooter className="flex justify-end items-center space-x-2 mt-2 bg-gray-100 rounded-b-md">
+				<DialogFooter className="flex justify-end items-center space-x-2 mt-2 rounded-b-md">
 					<DialogClose asChild>
 						<Button type="button" variant="secondary">
 							Close
 						</Button>
 					</DialogClose>
-					<Button type="submit" size="sm" className="px-3">
-						Rename
-					</Button>
+					<DialogClose asChild>
+						<Button type="submit" size="sm" className="px-3">
+							Rename
+						</Button>
+					</DialogClose>
 				</DialogFooter>
 			</form>
 		</Form>
@@ -125,9 +132,7 @@ export default function ElementContextMenu({
 				<ContextMenuTrigger>
 					<DiagramElement key={idx} id={element.id}>
 						<div className="flex items-center space-x-2">{element.type}</div>
-						<wokwi-show-pins pinRadius={6}>
-							<wokwi-breadboard type="normal" />
-						</wokwi-show-pins>
+						<wokwi-breadboard></wokwi-breadboard>
 					</DiagramElement>
 				</ContextMenuTrigger>
 				<ContextMenuContent>

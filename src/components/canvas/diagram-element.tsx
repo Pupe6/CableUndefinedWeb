@@ -23,7 +23,6 @@ export default function DiagramElement({
 	const [rotation, setRotation] = useState(0);
 
 	const handleDrag = (e: DraggableEvent, ui: DraggableData) => {
-		console.log(ui.deltaX, ui.deltaY, e);
 		dispatch(
 			dragElement({
 				id,

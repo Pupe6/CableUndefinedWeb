@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { wokwiElements } from "../../../utils/extract-wokwi-elements";
 import "@b.borisov/cu-elements";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,14 +18,11 @@ import {
 	getShowGrid,
 	getAllElements,
 	addElement,
-	dragElement,
-	editElementName,
 	deleteElement,
 } from "@/redux/features/diagrams/diagrams-slice";
-import { CheckboxItem, ItemIndicator } from "@radix-ui/react-context-menu";
-import { CheckIcon } from "lucide-react";
-import DiagramElement from "@/components/canvas/diagram-element";
 import ElementContextMenu from "@/components/canvas/element-context.menu";
+
+import { partMappings } from "@/types/wokwi-elements-mapping";
 
 const Canvas: React.FC = () => {
 	const elements = useAppSelector(getAllElements);
@@ -58,7 +54,7 @@ const Canvas: React.FC = () => {
 				<ScrollArea
 					className="flex flex-col items-center overflow-y-auto whitespace-nowrap rounded-md border"
 					aria-orientation="vertical">
-					{wokwiElements.map((element, idx) => (
+					{Object.entries(partMappings).map(([name, element], idx) => (
 						<div
 							key={idx}
 							className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer select-none"
@@ -68,8 +64,8 @@ const Canvas: React.FC = () => {
 										id: idx,
 										x: 0,
 										y: 0,
-										name: element.name,
-										type: element.element,
+										name,
+										type: element,
 									})
 								);
 								toast("Element added", {
@@ -79,11 +75,11 @@ const Canvas: React.FC = () => {
 											dispatch(deleteElement(idx));
 										},
 									},
-									description: `Added ${element.name} to canvas`,
+									description: `Added ${name} to canvas`,
 									closeButton: true,
 								});
 							}}>
-							{element.name}
+							{name}
 						</div>
 					))}
 				</ScrollArea>

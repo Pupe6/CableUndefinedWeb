@@ -1,31 +1,37 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { RootState } from "@reduxjs/toolkit/query";
 import { authApiSlice } from "./auth-api-slice";
-import { boolean } from "zod";
+import type { User } from "@/types/users";
 
-interface InitialState {
-	isAuthenticated: boolean;
-}
-
-const authState: InitialState = {
-	isAuthenticated: false,
+const authState: User = {
+	createdAt: "",
+	email: "",
+	lastActivity: "",
+	updatedAt: "",
+	username: "",
+	_id: "",
+	_token: "",
 };
 
 export const authHandlerSlice = createSlice({
 	name: "auth",
 	initialState: authState,
-	reducers: {
-		setAuth: (state, action) => {
-			action.payload.state.isAuthenticated = action.payload;
-		},
-	},
+	reducers: {},
 	extraReducers: builder => {
 		builder.addMatcher(
 			authApiSlice.endpoints.login.matchFulfilled,
 			(state, action) => {
-				state.isAuthenticated = true;
-				console.log(document.cookie);
+				console.log("login fulfilled", action.payload);
+				state._id = action.payload._id;
+				state.email = action.payload.email;
+				state.username = action.payload.username;
+				state.createdAt = action.payload.createdAt;
+				state.updatedAt = action.payload.updatedAt;
+				state.lastActivity = action.payload.lastActivity;
+				state._token = action.payload._token;
+				state = action.payload;
 			}
 		);
 	},
 });
+
+export default authHandlerSlice.reducer;

@@ -14,7 +14,7 @@ interface DiagramsElement {
 	x: number;
 	y: number;
 	name: string;
-	type: keyof WokwiElementMap;
+	type: keyof WokwiElementMap; // i need to use the actual wokwi element type here
 	angle: number;
 	locked: boolean;
 	version: number;
