@@ -25,7 +25,6 @@ export const authApiSlice = apiSlice.injectEndpoints({
 					socket.on(
 						SocketEvent.LOGIN,
 						(data: { user: User; error: string }) => {
-							console.log(data);
 							if (data.error) {
 								reject(data.error);
 							} else {
@@ -54,9 +53,11 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
 				return new Promise((resolve, reject) => {
 					socket.on(SocketEvent.REGISTER, (data: any) => {
-						if (data.error) {
+						console.log(data);
+						if ("error" in data) {
 							reject(data.error);
 						} else {
+							// i want to resolve with void here
 							resolve({ data: undefined });
 						}
 					});

@@ -22,7 +22,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const schema = z.object({
 	email: z.string().email(),
@@ -40,6 +40,8 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
 
 	const [login, { isLoading }] = useLoginMutation();
 
+	const { push } = useRouter();
+
 	const searchParams = useSearchParams();
 
 	const form = useForm<FormValues>({
@@ -56,6 +58,7 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
 				email: data.email,
 				password: data.password,
 			}).unwrap();
+			push("/dashboard");
 
 			toast({
 				title: "Welcome back!",
@@ -81,9 +84,7 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
 								name="email"
 								render={({ field, formState }) => (
 									<FormItem>
-										<FormLabel className="sr-only">
-											Email
-										</FormLabel>
+										<FormLabel className="sr-only">Email</FormLabel>
 										<FormControl>
 											<Input
 												id="email"
@@ -96,9 +97,7 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
 												{...field}
 											/>
 										</FormControl>
-										<FormMessage>
-											{formState.errors.email?.message}
-										</FormMessage>
+										<FormMessage>{formState.errors.email?.message}</FormMessage>
 									</FormItem>
 								)}
 							/>
@@ -107,9 +106,7 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
 								name="password"
 								render={({ field, formState }) => (
 									<FormItem>
-										<FormLabel className="sr-only">
-											Password
-										</FormLabel>
+										<FormLabel className="sr-only">Password</FormLabel>
 										<FormControl>
 											<Input
 												id="password"

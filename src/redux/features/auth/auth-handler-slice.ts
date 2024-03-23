@@ -9,7 +9,7 @@ const authState: User = {
 	updatedAt: "",
 	username: "",
 	_id: "",
-	_token: "",
+	_token: localStorage.getItem("_token") || "",
 };
 
 export const authHandlerSlice = createSlice({
@@ -29,9 +29,15 @@ export const authHandlerSlice = createSlice({
 				state.lastActivity = action.payload.lastActivity;
 				state._token = action.payload._token;
 				state = action.payload;
+				localStorage.setItem("_token", action.payload._token);
 			}
 		);
 	},
 });
+
+export const {} = authHandlerSlice.actions;
+
+export const selectToken = (state: { auth: { _token: string } }) =>
+	state.auth._token;
 
 export default authHandlerSlice.reducer;

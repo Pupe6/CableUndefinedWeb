@@ -11,6 +11,9 @@ function getSocket(namespace: SocketNamespace = SocketNamespace.INDEX) {
 	socket.on("connect", () => {
 		console.log("socket connected");
 	});
+	socket.on("error", error => {
+		console.log("socket error", error);
+	});
 	return socket;
 }
 

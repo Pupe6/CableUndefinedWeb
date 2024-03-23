@@ -34,10 +34,11 @@ const schema = z
 		email: z.string().email(),
 		password: z
 			.string()
-			.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {
+			.regex(/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/, {
 				message:
-					"Password must be at least 8 characters long, contain at least 1 uppercase letter, 1 lowercase letter, and 1 number",
+					"Password must contain at least 6 characters, one uppercase letter, one lowercase letter, and one number",
 			}),
+
 		confirmPassword: z.string(),
 	})
 	.refine(data => data.password === data.confirmPassword, {
@@ -102,9 +103,7 @@ export function UserRegisterForm({
 								name="username"
 								render={({ field, formState }) => (
 									<FormItem>
-										<FormLabel className="sr-only">
-											Username
-										</FormLabel>
+										<FormLabel className="sr-only">Username</FormLabel>
 										<FormControl>
 											<Input
 												id="username"
@@ -128,9 +127,7 @@ export function UserRegisterForm({
 								name="email"
 								render={({ field, formState }) => (
 									<FormItem>
-										<FormLabel className="sr-only">
-											Email
-										</FormLabel>
+										<FormLabel className="sr-only">Email</FormLabel>
 										<FormControl>
 											<Input
 												id="email"
@@ -143,9 +140,7 @@ export function UserRegisterForm({
 												{...field}
 											/>
 										</FormControl>
-										<FormMessage>
-											{formState.errors.email?.message}
-										</FormMessage>
+										<FormMessage>{formState.errors.email?.message}</FormMessage>
 									</FormItem>
 								)}
 							/>
@@ -154,9 +149,7 @@ export function UserRegisterForm({
 								name="password"
 								render={({ field, formState }) => (
 									<FormItem>
-										<FormLabel className="sr-only">
-											Password
-										</FormLabel>
+										<FormLabel className="sr-only">Password</FormLabel>
 										<FormControl>
 											<Input
 												id="password"
@@ -180,9 +173,7 @@ export function UserRegisterForm({
 								name="confirmPassword"
 								render={({ field, formState }) => (
 									<FormItem>
-										<FormLabel className="sr-only">
-											Confirm Password
-										</FormLabel>
+										<FormLabel className="sr-only">Confirm Password</FormLabel>
 										<FormControl>
 											<Input
 												id="confirm-password"

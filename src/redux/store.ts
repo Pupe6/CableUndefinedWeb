@@ -1,8 +1,9 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 
-import { apiSlice } from "./api/api-slice";
 import { diagramsSlice } from "./features/diagrams/diagrams-slice";
 import { authHandlerSlice } from "./features/auth/auth-handler-slice";
+
+import { apiSlice } from "./api/api-slice";
 
 const AppReducer = combineReducers({
 	[apiSlice.reducerPath]: apiSlice.reducer,

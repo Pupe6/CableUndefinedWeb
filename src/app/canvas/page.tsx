@@ -44,7 +44,7 @@ const Canvas: React.FC = () => {
 			);
 		};
 	}, []);
-
+	console.log(process.env.NEXT_PUBLIC_API_URL);
 	return (
 		<div className="flex h-screen">
 			<div className="flex flex-col w-fit-content p-2 space-y-2">

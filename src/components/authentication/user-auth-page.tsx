@@ -1,15 +1,29 @@
-import Link from "next/link";
+"use client";
 import React from "react";
 import { cn } from "../../lib/utils";
 import { buttonVariants } from "../../components/ui/button";
+
 import { UserLoginForm } from "./user-login-form";
 import { UserRegisterForm } from "./user-register-form";
+
+import { useAppSelector } from "@/redux/hooks";
+import { selectToken } from "@/redux/features/auth/auth-handler-slice";
+
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
 interface Props {
 	register?: boolean;
 }
 
 export function UserAuthPage({ register }: Props) {
+	const token = useAppSelector(selectToken);
+
+	React.useLayoutEffect(() => {
+		if (token) {
+			redirect("/");
+		}
+	}, [token]);
 	return (
 		<>
 			<div className="container relative h-[800px] flex flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
@@ -40,9 +54,8 @@ export function UserAuthPage({ register }: Props) {
 					<div className="relative z-20 mt-auto">
 						<blockquote className="space-y-2">
 							<p className="text-lg">
-								&ldquo;This project has saved me countless hours
-								of work and helped me deliver a better
-								product.&rdquo;
+								&ldquo;This project has saved me countless hours of work and
+								helped me deliver a better product.&rdquo;
 							</p>
 							<footer className="text-sm">Garistov</footer>
 						</blockquote>
@@ -52,16 +65,11 @@ export function UserAuthPage({ register }: Props) {
 					<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
 						<div className="flex flex-col space-y-2 text-center">
 							<h1 className="text-2xl font-semibold tracking-tight">
-								{register
-									? "Create an account"
-									: "Welcome back"}
+								{register ? "Create an account" : "Welcome back"}
 							</h1>
 							<p className="text-sm text-muted-foreground">
 								{register ? (
-									<>
-										Enter your email below to create your
-										account
-									</>
+									<>Enter your email below to create your account</>
 								) : (
 									<>Log in to your account to continue.</>
 								)}
