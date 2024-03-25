@@ -14,7 +14,7 @@ export interface RegisterRequest {
 }
 
 export const authApiSlice = apiSlice.injectEndpoints({
-	endpoints: builder => ({
+	endpoints: (builder) => ({
 		login: builder.mutation<User, LoginRequest>({
 			queryFn: ({ email, password }) => {
 				const socket = getSocket(SocketNamespace.AUTH);
@@ -49,7 +49,11 @@ export const authApiSlice = apiSlice.injectEndpoints({
 			queryFn: ({ email, password, username }) => {
 				const socket = getSocket(SocketNamespace.AUTH);
 
-				socket.emit(SocketEvent.REGISTER, { email, password, username });
+				socket.emit(SocketEvent.REGISTER, {
+					email,
+					password,
+					username,
+				});
 
 				return new Promise((resolve, reject) => {
 					socket.on(SocketEvent.REGISTER, (data: any) => {
@@ -57,18 +61,19 @@ export const authApiSlice = apiSlice.injectEndpoints({
 						if ("error" in data) {
 							reject(data.error);
 						} else {
-							// i want to resolve with void here
 							resolve({ data: undefined });
 						}
 					});
 				});
 			},
 		}),
-		logout: builder.mutation({
+		logout: builder.mutation<void, void>({
 			queryFn: () => {
 				const socket = getSocket(SocketNamespace.AUTH);
-
-				socket.emit(SocketEvent.LOGOUT);
+				console.log("logging out", localStorage.getItem("_token"));
+				socket.emit(SocketEvent.LOGOUT, {
+					token: localStorage.getItem("_token"),
+				});
 
 				return new Promise((resolve, reject) => {
 					socket.on(SocketEvent.LOGOUT, (data: any) => {

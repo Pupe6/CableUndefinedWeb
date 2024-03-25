@@ -7,7 +7,6 @@ function getSocket(namespace: SocketNamespace = SocketNamespace.INDEX) {
 	if (!socket) {
 		socket = io(import.meta.env.VITE_API_URL + namespace);
 	}
-	console.log("socket", socket);
 	socket.on("connect", () => {
 		console.log("socket connected");
 	});

@@ -1,4 +1,3 @@
-"use client";
 import { createSlice } from "@reduxjs/toolkit";
 import { authApiSlice } from "./auth-api-slice";
 import type { User } from "@/types/users";
@@ -31,6 +30,13 @@ export const authHandlerSlice = createSlice({
 				state._token = action.payload._token;
 				state = action.payload;
 				localStorage.setItem("_token", action.payload._token);
+			}
+		);
+		builder.addMatcher(
+			authApiSlice.endpoints.logout.matchFulfilled,
+			(state) => {
+				state = authState;
+				localStorage.removeItem("_token");
 			}
 		);
 	},

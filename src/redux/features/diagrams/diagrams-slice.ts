@@ -1,6 +1,5 @@
-"use client";
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState } from "@redux/store";
+import { RootState } from "@/redux/store";
 import * as WokwiElements from "@b.borisov/cu-elements";
 
 type WokwiElement<T> = Partial<T> & React.ClassAttributes<T>;
@@ -35,7 +34,7 @@ export const diagramsSlice = createSlice({
 	name: "diagrams",
 	initialState,
 	reducers: {
-		toggleGrid: state => {
+		toggleGrid: (state) => {
 			state.showGrid = !state.showGrid;
 			localStorage.setItem("showGrid", state.showGrid ? "true" : "false");
 		},
@@ -47,21 +46,25 @@ export const diagramsSlice = createSlice({
 			state.elements.push(action.payload);
 		},
 		dragElement: (state, action) => {
-			const element = state.elements.find(e => e.id === action.payload.id);
+			const element = state.elements.find(
+				(e) => e.id === action.payload.id
+			);
 			if (element) {
 				element.x = action.payload.x;
 				element.y = action.payload.y;
 			}
 		},
 		editElementName: (state, action) => {
-			const element = state.elements.find(e => e.id === action.payload.id);
+			const element = state.elements.find(
+				(e) => e.id === action.payload.id
+			);
 			if (element) {
 				element.name = action.payload.name;
 			}
 		},
 		deleteElement: (state, action) => {
 			const id = action.payload;
-			state.elements = state.elements.filter(e => e.id !== id);
+			state.elements = state.elements.filter((e) => e.id !== id);
 		},
 	},
 });
