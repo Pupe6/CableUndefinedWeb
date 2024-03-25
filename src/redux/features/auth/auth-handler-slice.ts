@@ -3,13 +3,8 @@ import { authApiSlice } from "./auth-api-slice";
 import type { User } from "@/types/users";
 
 const authState: User = {
-	createdAt: "",
-	email: "",
-	lastActivity: "",
-	updatedAt: "",
-	username: "",
-	_id: "",
 	_token: localStorage.getItem("_token") || "",
+	...JSON.parse(localStorage.getItem("user") || "{}"),
 };
 
 export const authHandlerSlice = createSlice({
@@ -30,6 +25,7 @@ export const authHandlerSlice = createSlice({
 				state._token = action.payload._token;
 				state = action.payload;
 				localStorage.setItem("_token", action.payload._token);
+				localStorage.setItem("user", JSON.stringify(action.payload));
 			}
 		);
 		builder.addMatcher(
@@ -37,6 +33,7 @@ export const authHandlerSlice = createSlice({
 			(state) => {
 				state = authState;
 				localStorage.removeItem("_token");
+				localStorage.removeItem("user");
 			}
 		);
 	},
