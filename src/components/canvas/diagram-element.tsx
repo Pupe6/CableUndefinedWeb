@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
 	dragElement,
 	getAllElements,
-} from "@/redux/features/diagrams/diagrams-slice";
+} from "@/redux/features/diagrams/wokwi-elements-slice";
 
 interface ElementProps {
 	id: number;

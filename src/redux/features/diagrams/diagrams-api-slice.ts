@@ -1,14 +1,8 @@
 import { apiSlice } from "@/redux/api/api-slice";
 import { SocketEvent, SocketNamespace } from "@/types/socket";
 import { getSocket } from "@/utils/socket";
+import type { Diagram } from "@/types/diagrams";
 
-interface Diagram {
-	_id: string;
-	createdAt: string;
-	updatedAt: string;
-	_owner: string;
-	name: string;
-}
 export const diagramsApiSlice = apiSlice.injectEndpoints({
 	endpoints: (build) => ({
 		getDiagrams: build.query<Diagram[], void>({

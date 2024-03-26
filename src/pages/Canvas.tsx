@@ -18,7 +18,7 @@ import {
 	getAllElements,
 	addElement,
 	deleteElement,
-} from "@/redux/features/diagrams/diagrams-slice";
+} from "@/redux/features/diagrams/wokwi-elements-slice";
 import ElementContextMenu from "@/components/canvas/element-context.menu";
 
 import { partMappings } from "@/types/wokwi-elements-mapping";

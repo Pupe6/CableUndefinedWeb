@@ -28,16 +28,24 @@ import {
 
 import { useLogoutMutation } from "@/redux/features/auth/auth-api-slice";
 
+import { useMatch, useLocation } from "react-router-dom";
+
 import { Profile } from "@/components/profile";
 
 import { Outlet } from "react-router-dom";
 import { Footer } from "./Footer";
+
+import { DiagramsCombobox } from "../diagrams-combobox";
+import { useEffect } from "react";
 
 export function Applayout() {
 	const user = useAppSelector(selectUser);
 
 	const dispatch = useAppDispatch();
 	const [logout, { isLoading, isError }] = useLogoutMutation();
+
+	const location = useLocation();
+	const match = useMatch("/dashboard/:id");
 
 	const { toast } = useToast();
 
@@ -93,10 +101,22 @@ export function Applayout() {
 									</span>
 								</BreadcrumbLink>
 							</BreadcrumbItem>
-							<BreadcrumbSeparator />
-							<BreadcrumbItem>
-								<BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-							</BreadcrumbItem>
+							{match &&
+								location.pathname !== "/dashboard/new" && (
+									<>
+										<BreadcrumbSeparator>
+											<span className="text-5xl font-thin text-muted-foreground">
+												/
+											</span>
+										</BreadcrumbSeparator>
+
+										<BreadcrumbItem>
+											<BreadcrumbPage>
+												<DiagramsCombobox />
+											</BreadcrumbPage>
+										</BreadcrumbItem>
+									</>
+								)}
 						</BreadcrumbList>
 					</Breadcrumb>
 
