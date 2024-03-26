@@ -22,18 +22,20 @@ import { useToast } from "@/components/ui/use-toast";
 
 import { CreditCard, LogOut, User } from "lucide-react";
 
-import { useAppSelector } from "@/redux/hooks";
-import { selectUser } from "@/redux/features/auth/auth-handler-slice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+	selectUser,
+	setOpenProfile,
+} from "@/redux/features/auth/auth-handler-slice";
 
 import { useLogoutMutation } from "@/redux/features/auth/auth-api-slice";
 
-import Profile from "@/components/profile";
+import { Profile, DeleteProfile } from "@/components/profile";
 
 export default function Dashboard() {
-	const [open, setOpen] = useState(false);
-
 	const user = useAppSelector(selectUser);
 
+	const dispatch = useAppDispatch();
 	const [logout, { isLoading, isError }] = useLogoutMutation();
 
 	const { toast } = useToast();
@@ -105,7 +107,9 @@ export default function Dashboard() {
 								{user.email}
 							</p>
 						</DropdownMenuLabel>
-						<DropdownMenuItem onClick={() => setOpen(true)}>
+						<DropdownMenuItem
+							onClick={() => dispatch(setOpenProfile(true))}
+						>
 							<User className="mr-2 h-4 w-4" />
 							<span>Profile</span>
 						</DropdownMenuItem>
@@ -120,8 +124,9 @@ export default function Dashboard() {
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
-				<Profile open={open} onOpenChange={setOpen} />
 			</div>
+
+			<Profile />
 		</>
 	);
 }

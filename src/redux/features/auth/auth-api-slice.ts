@@ -86,11 +86,50 @@ export const authApiSlice = apiSlice.injectEndpoints({
 				});
 			},
 		}),
-		token: builder.mutation({
-			query: () => ({
-				url: "auth/token",
-				method: "POST",
-			}),
+		updateUser: builder.mutation<void, { password: string; data: User }>({
+			queryFn: async ({ password, data }) => {
+				const socket = getSocket(SocketNamespace.USERS);
+
+				socket.emit(SocketEvent.USER_UPDATE, {
+					token: localStorage.getItem("_token"),
+					password,
+					updatedUser: data,
+				});
+
+				return new Promise((resolve, reject) => {
+					socket.on(SocketEvent.USER_UPDATE, (data: any) => {
+						if (data.error) {
+							reject(data.error);
+						} else {
+							resolve({
+								data: data,
+							});
+						}
+					});
+				});
+			},
+		}),
+		deleteUser: builder.mutation<void, { password: string }>({
+			queryFn: async ({ password }) => {
+				const socket = getSocket(SocketNamespace.USERS);
+
+				socket.emit(SocketEvent.USER_DELETE, {
+					token: localStorage.getItem("_token"),
+					password,
+				});
+
+				return new Promise((resolve, reject) => {
+					socket.on(SocketEvent.USER_DELETE, (data: any) => {
+						if (data.error) {
+							reject(data.error);
+						} else {
+							resolve({
+								data: data,
+							});
+						}
+					});
+				});
+			},
 		}),
 	}),
 	overrideExisting: false,
@@ -100,5 +139,6 @@ export const {
 	useLoginMutation,
 	useRegisterMutation,
 	useLogoutMutation,
-	useTokenMutation,
+	useUpdateUserMutation,
+	useDeleteUserMutation,
 } = authApiSlice;
