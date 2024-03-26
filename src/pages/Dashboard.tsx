@@ -1,132 +1,66 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
-	BreadcrumbPage,
-	BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { PageHeader, PageHeaderHeading } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import { useToast } from "@/components/ui/use-toast";
-
-import { CreditCard, LogOut, User } from "lucide-react";
-
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import {
-	selectUser,
-	setOpenProfile,
-} from "@/redux/features/auth/auth-handler-slice";
-
-import { useLogoutMutation } from "@/redux/features/auth/auth-api-slice";
-
-import { Profile, DeleteProfile } from "@/components/profile";
+import { useGetDiagramsQuery } from "@/redux/features/diagrams/diagrams-api-slice";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function Dashboard() {
-	const user = useAppSelector(selectUser);
+	const navigate = useNavigate();
 
-	const dispatch = useAppDispatch();
-	const [logout, { isLoading, isError }] = useLogoutMutation();
+	const { data: diagrams, isLoading } = useGetDiagramsQuery();
 
-	const { toast } = useToast();
-
-	const handleLogout = async () => {
-		try {
-			await logout();
-			toast({
-				title: "Success",
-				description: "Logged out successfully",
-			});
-		} catch (error) {
-			toast({
-				title: "Error",
-				description: "An error occurred while logging out",
-				variant: "destructive",
-			});
-		}
-	};
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
 
 	return (
 		<>
-			<div className="flex justify-between items-center p-4">
-				<Breadcrumb>
-					<BreadcrumbList>
-						<BreadcrumbItem>
-							<BreadcrumbLink href="/dashboard">
-								<h1 className="relative flex flex-row items-baseline text-2xl font-bold">
-									<span className="sr-only">
-										CableUndefined
-									</span>
-									<span className="tracking-tight hover:cursor-pointer text-primary">
-										Cable
-										<span className="text-muted-foreground hover:text-primary">
-											Undefined
-										</span>
-									</span>
-									<sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs font-bold text-black hidden">
-										[BETA]
-									</sup>
-								</h1>
-							</BreadcrumbLink>
-						</BreadcrumbItem>
-						<BreadcrumbSeparator>
-							<span className="text-5xl font-thin text-muted-foreground">
-								/
-							</span>
-						</BreadcrumbSeparator>
-						<BreadcrumbItem>
-							<BreadcrumbLink href="/components">
-								Components
-							</BreadcrumbLink>
-						</BreadcrumbItem>
-						<BreadcrumbSeparator />
-						<BreadcrumbItem>
-							<BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-						</BreadcrumbItem>
-					</BreadcrumbList>
-				</Breadcrumb>
-
-				<DropdownMenu>
-					<DropdownMenuTrigger>Open</DropdownMenuTrigger>
-					<DropdownMenuContent>
-						<DropdownMenuLabel>
-							<p className="text-sm font-medium leading-none">
-								{user.username}
-							</p>
-							<p className="text-xs leading-none text-muted-foreground">
-								{user.email}
-							</p>
-						</DropdownMenuLabel>
-						<DropdownMenuItem
-							onClick={() => dispatch(setOpenProfile(true))}
+			<PageHeader className="flex flex-col md:flex-row justify-between">
+				<PageHeaderHeading>Your Diagrams</PageHeaderHeading>
+				<Button onClick={() => navigate("/dashboard/new")}>
+					<Plus />
+					<span className="blockmd:hiddenlg:blockml-2">
+						Create New Diagram
+					</span>
+				</Button>
+			</PageHeader>
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+				{diagrams ? (
+					diagrams.map((diagram) => (
+						<Card
+							onClick={() =>
+								navigate(`/dashboard/${diagram._id}`)
+							}
+							key={diagram._id}
+							className="w-[368px] h-[256px] cursor-pointer"
 						>
-							<User className="mr-2 h-4 w-4" />
-							<span>Profile</span>
-						</DropdownMenuItem>
-						<DropdownMenuItem>
-							<CreditCard className="mr-2 h-4 w-4" />
-							<span>Billing</span>
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={handleLogout}>
-							<LogOut className="mr-2 h-4 w-4" />
-							<span>Log out</span>
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+							<div
+								className="flex h-2/6 items-center justify-center bg-neutral-100 px-4 py-5 font-bold text-background dark:bg-zinc-950 sm:p-6 rounded-t-sm"
+								style={{
+									backgroundImage:
+										'url(\'data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z" fill="%23e51c23" fill-opacity="0.4" fill-rule="evenodd"/%3E%3C/svg%3E\')',
+								}}
+							/>
+							<CardContent className="p-4">
+								<div className="text-lg font-bold">
+									{diagram.name}
+								</div>
+								<div className="text-sm text-muted-foreground">
+									Created on{" "}
+									{new Date(
+										diagram.createdAt
+									).toLocaleString()}
+								</div>
+							</CardContent>
+						</Card>
+					))
+				) : (
+					<div>No diagrams found</div>
+				)}
 			</div>
-
-			<Profile />
 		</>
 	);
 }
