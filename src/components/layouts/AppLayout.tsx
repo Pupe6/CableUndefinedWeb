@@ -35,8 +35,8 @@ import { Profile } from "@/components/profile";
 import { Outlet } from "react-router-dom";
 import { Footer } from "./Footer";
 
+import { UserCombobox } from "../user-combobox";
 import { DiagramsCombobox } from "../diagrams-combobox";
-import { useEffect } from "react";
 
 export function Applayout() {
 	const user = useAppSelector(selectUser);
@@ -68,7 +68,7 @@ export function Applayout() {
 	return (
 		<>
 			<div className="flex-grow flex flex-col">
-				<div className="flex justify-between items-center p-4">
+				<div className="flex justify-between items-center   mx-auto h-24 w-full max-w-7xl gap-x-6 p-6 sm:flex lg:px-8">
 					<Breadcrumb>
 						<BreadcrumbList className="flex items-center space-x-2">
 							<BreadcrumbItem>
@@ -95,11 +95,7 @@ export function Applayout() {
 								</span>
 							</BreadcrumbSeparator>
 							<BreadcrumbItem>
-								<BreadcrumbLink href="/components">
-									<span className="text-lg font-bold">
-										@{user.username}
-									</span>
-								</BreadcrumbLink>
+								<UserCombobox />
 							</BreadcrumbItem>
 							{match &&
 								location.pathname !== "/dashboard/new" && (

@@ -60,7 +60,7 @@ export function DiagramsCombobox() {
 					variant="ghost"
 					role="combobox"
 					aria-expanded={open}
-					className="w-[200px] justify-between"
+					className="w-[220px] justify-between p-0"
 				>
 					<div className="flex items-center gap-2">
 						<div
@@ -70,7 +70,7 @@ export function DiagramsCombobox() {
 							<span>
 								{currentDiagram
 									? currentDiagram.name.charAt(0)
-									: "N"}
+									: "D"}
 							</span>
 						</div>
 						<span className="truncate">
@@ -79,10 +79,10 @@ export function DiagramsCombobox() {
 								: "Select diagram"}
 						</span>
 					</div>
-					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 mr-3" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-[200px] p-0">
+			<PopoverContent className="w-[220px] p-0">
 				<Command>
 					<CommandInput placeholder="Search diagram..." />
 					<CommandList>
@@ -104,7 +104,7 @@ export function DiagramsCombobox() {
 								>
 									<Check
 										className={cn(
-											"mr-2 h-4 w-4",
+											"mr-2 h-4 w-4 shrink-0 opacity-50",
 											diagram._id === currentDiagram?._id
 												? "opacity-100"
 												: "opacity-0"
