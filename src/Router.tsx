@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import Sample from "./pages/Sample";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
+import CreateDiagram from "./pages/CreateDiagram";
+import Canvas from "./pages/Canvas";
 
 export const unauthenticatedRouter = createBrowserRouter(
 	[
@@ -39,9 +41,18 @@ export const authenticatedRouter = createBrowserRouter(
 			element: <Applayout />,
 			children: [
 				{
-					path: "",
+					path: "dashboard",
 					element: <Dashboard />,
 				},
+				{
+					path: "dashboard/new",
+					element: <CreateDiagram />,
+				},
+				{
+					path: "dashboard/:id",
+					element: <Canvas />,
+				},
+
 				{
 					path: "sample",
 					element: <Sample />,

@@ -1,75 +1,66 @@
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
-	BreadcrumbPage,
-	BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { useNavigate } from "react-router-dom";
 
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { PageHeader, PageHeaderHeading } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
-import { LogOut, User, Wallet } from "lucide-react";
-
-import { useAppSelector } from "@/redux/hooks";
-import { selectUser } from "@/redux/features/auth/auth-handler-slice";
+import { useGetDiagramsQuery } from "@/redux/features/diagrams/diagrams-api-slice";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function Dashboard() {
-	const user = useAppSelector(selectUser);
+	const navigate = useNavigate();
+
+	const { data: diagrams, isLoading } = useGetDiagramsQuery();
+
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
 
 	return (
-		<div className="container mx-auto">
-			<Breadcrumb>
-				<BreadcrumbList>
-					<BreadcrumbItem>
-						<BreadcrumbLink href="/">CableUndefined</BreadcrumbLink>
-					</BreadcrumbItem>
-					<BreadcrumbSeparator />
-					<BreadcrumbItem>
-						<BreadcrumbLink href="/components">
-							Components
-						</BreadcrumbLink>
-					</BreadcrumbItem>
-					<BreadcrumbSeparator />
-					<BreadcrumbItem>
-						<BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-					</BreadcrumbItem>
-				</BreadcrumbList>
-			</Breadcrumb>
-
-			<DropdownMenu>
-				<DropdownMenuTrigger>Open</DropdownMenuTrigger>
-				<DropdownMenuContent>
-					<DropdownMenuLabel>
-						<p className="text-sm font-medium leading-none">
-							{user.username}
-						</p>
-						<p className="text-xs leading-none text-muted-foreground">
-							{user.email}
-						</p>
-					</DropdownMenuLabel>
-					<DropdownMenuItem>
-						<User />
-						Profile
-					</DropdownMenuItem>
-					<DropdownMenuItem>
-						<Wallet />
-						Billing
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<DropdownMenuItem>
-						<LogOut />
-						Log Out
-					</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</div>
+		<>
+			<PageHeader className="flex flex-col md:flex-row justify-between">
+				<PageHeaderHeading>Your Diagrams</PageHeaderHeading>
+				<Button onClick={() => navigate("/dashboard/new")}>
+					<Plus />
+					<span className="blockmd:hiddenlg:blockml-2">
+						Create New Diagram
+					</span>
+				</Button>
+			</PageHeader>
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+				{diagrams ? (
+					diagrams.map((diagram) => (
+						<Card
+							onClick={() =>
+								navigate(`/dashboard/${diagram._id}`)
+							}
+							key={diagram._id}
+							className="w-[368px] h-[256px] cursor-pointer"
+						>
+							<div
+								className="flex h-2/6 items-center justify-center bg-neutral-100 px-4 py-5 font-bold text-background dark:bg-zinc-950 sm:p-6 rounded-t-sm"
+								style={{
+									backgroundImage:
+										'url(\'data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z" fill="%23e51c23" fill-opacity="0.4" fill-rule="evenodd"/%3E%3C/svg%3E\')',
+								}}
+							/>
+							<CardContent className="p-4">
+								<div className="text-lg font-bold">
+									{diagram.name}
+								</div>
+								<div className="text-sm text-muted-foreground">
+									Created on{" "}
+									{new Date(
+										diagram.createdAt
+									).toLocaleString()}
+								</div>
+							</CardContent>
+						</Card>
+					))
+				) : (
+					<div>No diagrams found</div>
+				)}
+			</div>
+		</>
 	);
 }

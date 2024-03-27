@@ -27,11 +27,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { DialogFooter } from "@/components/ui/dialog";
-import { editElementName } from "@/redux/features/diagrams/diagrams-slice";
+import { editElementName } from "@/redux/features/diagrams/wokwi-elements-slice";
 
 import DiagramElement from "@/components/canvas/diagram-element";
 import { useAppDispatch } from "@/redux/hooks";
-import { deleteElement } from "@/redux/features/diagrams/diagrams-slice";
+import { deleteElement } from "@/redux/features/diagrams/wokwi-elements-slice";
 
 import "@b.borisov/cu-elements";
 import { AnalogJoystickElement } from "@b.borisov/cu-elements";
@@ -131,7 +131,9 @@ export default function ElementContextMenu({
 			<ContextMenu>
 				<ContextMenuTrigger>
 					<DiagramElement key={idx} id={element.id}>
-						<div className="flex items-center space-x-2">{element.type}</div>
+						<div className="flex items-center space-x-2">
+							{element.type}
+						</div>
 						<wokwi-breadboard></wokwi-breadboard>
 					</DiagramElement>
 				</ContextMenuTrigger>
@@ -145,7 +147,8 @@ export default function ElementContextMenu({
 					<ContextMenuItem>Rotate</ContextMenuItem>
 					<ContextMenuItem
 						onClick={() => dispatch(deleteElement(element.id))}
-						className="hover:text-red-500 cursor-pointer">
+						className="hover:text-red-500 cursor-pointer"
+					>
 						Remove
 					</ContextMenuItem>
 				</ContextMenuContent>

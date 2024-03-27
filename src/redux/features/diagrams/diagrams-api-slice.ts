@@ -1,10 +1,11 @@
 import { apiSlice } from "@/redux/api/api-slice";
 import { SocketEvent, SocketNamespace } from "@/types/socket";
 import { getSocket } from "@/utils/socket";
+import type { Diagram } from "@/types/diagrams";
 
 export const diagramsApiSlice = apiSlice.injectEndpoints({
-	endpoints: build => ({
-		getDiagrams: build.query<void, void>({
+	endpoints: (build) => ({
+		getDiagrams: build.query<Diagram[], void>({
 			queryFn: () => {
 				const socket = getSocket(SocketNamespace.DIAGRAMS);
 
@@ -24,9 +25,8 @@ export const diagramsApiSlice = apiSlice.injectEndpoints({
 					});
 				});
 			},
-		}),
-		getDiagram: build.query({
-			query: (id: string) => `diagrams/${id}`,
+			providesTags: (result) =>
+				result ? [{ type: "Diagrams", id: "LIST" }] : [],
 		}),
 		createDiagram: build.mutation({
 			queryFn: (body: { name: string }) => {
@@ -49,8 +49,9 @@ export const diagramsApiSlice = apiSlice.injectEndpoints({
 					});
 				});
 			},
+			invalidatesTags: [{ type: "Diagrams", id: "LIST" }],
 		}),
-		updateDiagram: build.mutation({
+		updateDiagram: build.mutation<Diagram, { id: string; name: string }>({
 			queryFn: (body: { id: string; name: string }) => {
 				const socket = getSocket(SocketNamespace.DIAGRAMS);
 
@@ -76,6 +77,10 @@ export const diagramsApiSlice = apiSlice.injectEndpoints({
 					});
 				});
 			},
+			invalidatesTags: (result) =>
+				result
+					? [{ type: "Diagrams", id: "LIST" }]
+					: [{ type: "Diagrams", id: "LIST" }],
 		}),
 		deleteDiagram: build.mutation({
 			queryFn: (id: string) => {
@@ -100,6 +105,14 @@ export const diagramsApiSlice = apiSlice.injectEndpoints({
 					});
 				});
 			},
+			invalidatesTags: [{ type: "Diagrams", id: "LIST" }],
 		}),
 	}),
 });
+
+export const {
+	useGetDiagramsQuery,
+	useCreateDiagramMutation,
+	useUpdateDiagramMutation,
+	useDeleteDiagramMutation,
+} = diagramsApiSlice;

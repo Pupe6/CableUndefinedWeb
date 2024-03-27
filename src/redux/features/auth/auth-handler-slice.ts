@@ -1,45 +1,69 @@
-"use client";
 import { createSlice } from "@reduxjs/toolkit";
 import { authApiSlice } from "./auth-api-slice";
 import type { User } from "@/types/users";
 
-const authState: User = {
-	createdAt: "",
-	email: "",
-	lastActivity: "",
-	updatedAt: "",
-	username: "",
-	_id: "",
-	_token: localStorage.getItem("_token") || "",
+interface AuthState {
+	user: User;
+	openProfile: boolean;
+	openDeleteProfile: boolean;
+	openUpdateProfile: boolean;
+}
+
+const authState: AuthState = {
+	user: {
+		_token: localStorage.getItem("_token") || "",
+		...JSON.parse(localStorage.getItem("user") || "{}"),
+	},
+	openProfile: false,
+	openDeleteProfile: false,
+	openUpdateProfile: false,
 };
 
 export const authHandlerSlice = createSlice({
 	name: "auth",
 	initialState: authState,
-	reducers: {},
+	reducers: {
+		setOpenProfile: (state, action) => {
+			state.openProfile = action.payload;
+		},
+		setOpenDeleteProfile: (state, action) => {
+			state.openDeleteProfile = action.payload;
+		},
+		setOpenUpdateProfile: (state, action) => {
+			state.openUpdateProfile = action.payload;
+		},
+	},
 	extraReducers: (builder) => {
 		builder.addMatcher(
 			authApiSlice.endpoints.login.matchFulfilled,
 			(state, action) => {
-				console.log("login fulfilled", action.payload);
-				state._id = action.payload._id;
-				state.email = action.payload.email;
-				state.username = action.payload.username;
-				state.createdAt = action.payload.createdAt;
-				state.updatedAt = action.payload.updatedAt;
-				state.lastActivity = action.payload.lastActivity;
-				state._token = action.payload._token;
-				state = action.payload;
+				state.user = action.payload;
 				localStorage.setItem("_token", action.payload._token);
+				localStorage.setItem("user", JSON.stringify(action.payload));
+			}
+		);
+		builder.addMatcher(
+			authApiSlice.endpoints.logout.matchFulfilled,
+			(state) => {
+				state = authState;
+				localStorage.removeItem("_token");
+				localStorage.removeItem("user");
 			}
 		);
 	},
 });
 
-export const {} = authHandlerSlice.actions;
+export const { setOpenProfile, setOpenDeleteProfile, setOpenUpdateProfile } =
+	authHandlerSlice.actions;
 
-export const selectIsAuthenticated = (state: { auth: User }) =>
-	state.auth._token !== "";
-export const selectUser = (state: { auth: User }) => state.auth;
+export const selectIsAuthenticated = (state: { auth: AuthState }) =>
+	state.auth.user._token !== "";
+export const selectUser = (state: { auth: AuthState }) => state.auth.user;
+export const selectOpenProfile = (state: { auth: AuthState }) =>
+	state.auth.openProfile;
+export const selectOpenDeleteProfile = (state: { auth: AuthState }) =>
+	state.auth.openDeleteProfile;
+export const selectOpenUpdateProfile = (state: { auth: AuthState }) =>
+	state.auth.openUpdateProfile;
 
 export default authHandlerSlice.reducer;
