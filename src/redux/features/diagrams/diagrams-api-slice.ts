@@ -112,6 +112,7 @@ export const diagramsApiSlice = apiSlice.injectEndpoints({
 
 export const {
 	useGetDiagramsQuery,
+	useLazyGetDiagramsQuery,
 	useCreateDiagramMutation,
 	useUpdateDiagramMutation,
 	useDeleteDiagramMutation,

@@ -34,7 +34,10 @@ import { useAppDispatch } from "@/redux/hooks";
 import { deleteElement } from "@/redux/features/diagrams/wokwi-elements-slice";
 
 import "@b.borisov/cu-elements";
-import { AnalogJoystickElement } from "@b.borisov/cu-elements";
+
+import type { DiagramsElement } from "@/redux/features/diagrams/wokwi-elements-slice";
+import { partMappings } from "@/types/wokwi-elements-mapping";
+import { useEffect, useRef } from "react";
 
 const schema = z.object({
 	name: z.string(),
@@ -113,15 +116,25 @@ const RenameElementForm = ({
 	);
 };
 
+function LitElementWrapper({ element }: { element: DiagramsElement }) {
+	const ref = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const el = partMappings[element.name];
+		ref.current?.appendChild(el);
+		return () => {
+			ref.current?.removeChild(el);
+		};
+	}, [element.name]);
+
+	return <div ref={ref} />;
+}
+
 export default function ElementContextMenu({
 	element,
 	idx,
 }: {
-	element: {
-		id: number;
-		type: string;
-		name: string;
-	};
+	element: DiagramsElement;
 	idx: number;
 }): JSX.Element {
 	const dispatch = useAppDispatch();
@@ -132,9 +145,9 @@ export default function ElementContextMenu({
 				<ContextMenuTrigger>
 					<DiagramElement key={idx} id={element.id}>
 						<div className="flex items-center space-x-2">
-							{element.type}
+							{element.name}
 						</div>
-						<wokwi-breadboard></wokwi-breadboard>
+						<LitElementWrapper element={element} />
 					</DiagramElement>
 				</ContextMenuTrigger>
 				<ContextMenuContent>

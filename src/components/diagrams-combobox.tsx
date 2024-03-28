@@ -20,6 +20,7 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 
+import { useLazyGetDiagramsQuery } from "@/redux/features/diagrams/diagrams-api-slice";
 import { useAppSelector } from "@/redux/hooks";
 import {
 	selectDiagrams,
@@ -29,9 +30,12 @@ import {
 import type { Diagram } from "@/types/diagrams";
 
 import { useNavigate, useParams } from "react-router-dom";
+import { Skeleton } from "./ui/skeleton";
 
 export function DiagramsCombobox() {
 	const { id } = useParams();
+
+	const [getDiagrams, { isLoading }] = useLazyGetDiagramsQuery();
 
 	const diagrams = useAppSelector(selectDiagrams);
 	const currentDiagramBySelector = useAppSelector((state) =>
@@ -45,13 +49,21 @@ export function DiagramsCombobox() {
 	React.useLayoutEffect(() => {
 		if (id) {
 			if (!currentDiagramBySelector) {
-				navigate("/not-found", { replace: true });
+				try {
+					getDiagrams();
+				} catch (error) {
+					navigate("/not-found", { replace: true });
+				}
 			}
 			setCurrentDiagram(currentDiagramBySelector);
 		} else {
 			navigate("/dashboard");
 		}
 	}, [diagrams]);
+
+	if (isLoading) {
+		return <Skeleton className="w-[220px] h-10" />;
+	}
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

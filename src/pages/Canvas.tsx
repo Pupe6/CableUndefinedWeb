@@ -49,60 +49,60 @@ const Canvas: React.FC = () => {
 			);
 		};
 	}, []);
+
 	return (
-		<div className="flex h-screen">
+		<div className="flex h-full">
 			<div className="flex flex-col w-fit-content p-2 space-y-2">
-				<h1 className="text-2xl font-bold text-center p-2 bg-gray-100 rounded-md">
+				<h1 className="text-2xl font-bold text-center p-2 bg-gray-100 rounded-md dark:bg-gray-800">
 					Choose Elements:
 				</h1>
 				<ScrollArea
-					className="flex flex-col items-center overflow-y-auto whitespace-nowrap rounded-md border"
+					className="flex flex-col items-center overflow-y-auto whitespace-nowrap rounded-md border h-[80vh] dark:border-gray-800"
 					aria-orientation="vertical"
 				>
-					{Object.entries(partMappings).map(
-						([name, element], idx) => (
-							<div
-								key={idx}
-								className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer select-none"
-								onClick={() => {
-									dispatch(
-										addElement({
-											id: idx,
-											x: 0,
-											y: 0,
-											name,
-											type: element,
-										})
-									);
-									toast({
-										title: "Element added",
-										action: (
-											<Button
-												onClick={() => {
-													dispatch(
-														deleteElement(idx)
-													);
-													dismiss();
-												}}
-											>
-												Undo
-											</Button>
-										),
-										description: `Added ${name} to canvas`,
-									});
-								}}
-							>
-								{name}
-							</div>
-						)
-					)}
+					{Object.entries(partMappings).map(([name], idx) => (
+						<div
+							key={idx}
+							className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer select-none dark:hover:bg-gray-800"
+							onClick={() => {
+								dispatch(
+									addElement({
+										id: idx,
+										x: 0,
+										y: 0,
+										name,
+										angle: 0,
+										locked: false,
+										version: 1,
+										updated: Date.now(),
+									})
+								);
+								toast({
+									title: "Element added",
+									action: (
+										<Button
+											onClick={() => {
+												dispatch(deleteElement(idx));
+												dismiss();
+											}}
+										>
+											Undo
+										</Button>
+									),
+									description: `Added ${name} to canvas`,
+								});
+							}}
+						>
+							{name}
+						</div>
+					))}
 				</ScrollArea>
 			</div>
-			<div className="flex-1 relative h-screen">
+			<div className="flex-1 relative">
 				<ContextMenu>
 					<ContextMenuTrigger>
 						<div
-							className={`flex-1 relative h-screen ${
+							className={`flex-1 relative ${
 								showGrid ? "scene-grid" : ""
 							}`}
 						>
