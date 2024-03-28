@@ -56,23 +56,10 @@ export default function DiagramElement({
 					transform: `rotate(${rotation}deg)`,
 					position: "absolute",
 					transition: "transform 150ms ease",
-					cursor: "move",
 				}}
-				className="flex flex-col items-center space-y-2 p-2 bg-gray-100 rounded-md w-1/6"
+				className="flex flex-col items-center space-y-2 p-2 rounded-md w-1/6"
 			>
 				{children}
-				{element?.name}
-				<div
-					// onClick={handleRotate}
-					style={{
-						cursor: "pointer",
-						background: "gray",
-						padding: "5px",
-						borderRadius: "5px",
-					}}
-				>
-					Rotate
-				</div>
 			</div>
 		</Draggable>
 	);

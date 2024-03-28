@@ -118,6 +118,7 @@ const RenameElementForm = ({
 
 function LitElementWrapper({ element }: { element: DiagramsElement }) {
 	const ref = useRef<HTMLDivElement>(null);
+	const showPinsRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const el = partMappings[element.name];
@@ -127,7 +128,15 @@ function LitElementWrapper({ element }: { element: DiagramsElement }) {
 		};
 	}, [element.name]);
 
-	return <div ref={ref} />;
+	useEffect(() => {
+		const el = partMappings["Show Pins"];
+		showPinsRef.current?.appendChild(el);
+		return () => {
+			showPinsRef.current?.removeChild(el);
+		};
+	}, []);
+
+	return <div ref={ref}></div>;
 }
 
 export default function ElementContextMenu({
@@ -150,7 +159,7 @@ export default function ElementContextMenu({
 						<LitElementWrapper element={element} />
 					</DiagramElement>
 				</ContextMenuTrigger>
-				<ContextMenuContent>
+				<ContextMenuContent className="w-48">
 					<ContextMenuItem>
 						<DialogTrigger asChild>
 							<ContextMenuItem>Rename</ContextMenuItem>

@@ -53,6 +53,7 @@ const partMappings: WokwiElementsMapping = {
 	"Small Sound Sensor": new wokwiElements.SmallSoundSensorElement(),
 	SSD1306: new wokwiElements.SSD1306Element(),
 	"Stepper Motor": new wokwiElements.StepperMotorElement(),
+	"Show Pins": new wokwiElements.ShowPinsElement(),
 	"Tilt Switch": new wokwiElements.TiltSwitchElement(),
 };
 

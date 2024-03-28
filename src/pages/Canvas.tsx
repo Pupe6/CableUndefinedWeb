@@ -102,9 +102,7 @@ const Canvas: React.FC = () => {
 				<ContextMenu>
 					<ContextMenuTrigger>
 						<div
-							className={`flex-1 relative ${
-								showGrid ? "scene-grid" : ""
-							}`}
+							className={`flex-1 ${showGrid ? "scene-grid" : ""}`}
 						>
 							{elements.map((element, idx) => (
 								// <KeepScale>
