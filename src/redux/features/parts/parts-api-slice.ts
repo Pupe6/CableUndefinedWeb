@@ -78,3 +78,9 @@ const partsApiSlice = apiSlice.injectEndpoints({
 		}),
 	}),
 });
+
+export const {
+	useAddPartMutation,
+	useUpdatePartMutation,
+	useRemovePartMutation,
+} = partsApiSlice;
